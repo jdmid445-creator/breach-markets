@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { Avatar } from "@/components/Avatar";
 import { Verified } from "@/components/desk/ui";
 import { Tilt, Counter, EASE } from "./motion";
+import { Podium3D } from "./three";
 
 type P = { address: string; name: string; image: string; verified?: boolean; value: number; sub: string };
 
@@ -12,7 +13,9 @@ export function Podium({ rows, signed = false, label }: { rows: P[]; signed?: bo
   const reduce = useReducedMotion();
   const max = Math.max(...rows.map((r) => Math.abs(r.value)), 1);
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <>
+    {rows.length >= 3 && <Podium3D className="hidden h-[470px] md:block" signed={signed} rows={rows.slice(0, 3).map((r) => ({ address: r.address, name: r.name, value: r.value, sub: r.sub }))} />}
+    <div className={`grid gap-4 md:grid-cols-3 ${rows.length >= 3 ? "md:hidden" : ""}`}>
       {rows.slice(0, 3).map((t, i) => (
         <motion.div
           key={t.address}
@@ -55,5 +58,6 @@ export function Podium({ rows, signed = false, label }: { rows: P[]; signed?: bo
         </motion.div>
       ))}
     </div>
+    </>
   );
 }

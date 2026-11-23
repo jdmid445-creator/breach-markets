@@ -6,6 +6,7 @@ import { HomeLive } from "@/components/desk/Whales";
 import { LeaderHub } from "@/components/fx/LeaderHub";
 import { Reveal } from "@/components/fx/motion";
 import { BigTitle, VelocityTape } from "@/components/fx/scroll";
+import { HeroTail3D } from "@/components/fx/three";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
 import { Avatar } from "@/components/Avatar";
 import { podConsensus } from "@/lib/smart";
@@ -44,7 +45,10 @@ export default async function Home() {
       <div aria-hidden className="h-24 bg-[linear-gradient(180deg,#0a0f26,#03203d)]" />
 
       <div className="mx-auto max-w-[1360px] px-5 pt-28 md:px-8">
-        <BigTitle text="Top traders today" hi={["today"]} className="text-[clamp(52px,9.5vw,156px)] text-fg" />
+        <div className="relative">
+          <BigTitle text="Top traders today" hi={["today"]} className="relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
+          <HeroTail3D className="pointer-events-none absolute -right-4 top-[10px] hidden h-[380px] w-[380px] lg:block xl:right-4" />
+        </div>
         <div className="mt-6">
           <LeaderHub initial={today ?? []} titled={false} />
         </div>

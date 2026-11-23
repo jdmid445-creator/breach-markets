@@ -8,6 +8,7 @@ import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified, Side } from "@/compo
 import { Sea } from "@/components/fx/Sea";
 import { Counter, Reveal, SplitTitle } from "@/components/fx/motion";
 import { CopyAddress } from "@/components/desk/CopyAddress";
+import { Medal3D } from "@/components/fx/three";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               )}
             </div>
           </div>
+          <Medal3D rank={best?.rank ?? null} label={best ? `${best.label} profit` : "unranked"} className="hidden h-[190px] w-[190px] shrink-0 md:block" />
           <a
             href={pmProfile(address)}
             target="_blank"

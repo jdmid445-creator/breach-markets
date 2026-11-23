@@ -10,6 +10,7 @@ import { usd } from "@/lib/format";
 import { Avatar } from "@/components/Avatar";
 import { Verified } from "@/components/desk/ui";
 import { SplitTitle, Tilt, Counter, Magnetic, EASE } from "./motion";
+import { Podium3D } from "./three";
 
 type Row = Trader & { trades?: number };
 type Sort = "PNL" | "VOLUME";
@@ -139,8 +140,16 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
         {loading && !entry && <Skeleton />}
         {entry && rows.length === 0 && <p className="py-20 text-center text-mist">No {marketLabel} traders on the board yet today.</p>}
 
+        {top.length >= 3 && (
+          <Podium3D
+            key={key}
+            className="hidden h-[470px] md:block"
+            signed={!single && sort === "PNL"}
+            rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: single ? `${t.trades ?? 0} ${t.trades === 1 ? "bet" : "bets"} today` : sort === "PNL" ? "profit today" : "traded today" }))}
+          />
+        )}
         {top.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className={`grid gap-4 md:grid-cols-3 ${top.length >= 3 ? "md:hidden" : ""}`}>
             <AnimatePresence mode="popLayout" initial={false}>
               {top.map((t, i) => (
                 <motion.div
