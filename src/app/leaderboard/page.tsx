@@ -70,7 +70,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
         </div>
       </PageHeader>
       <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1360px] px-5 md:px-8">
-        <div className="overflow-hidden rounded-lg border border-hair bg-shoal">{board}</div>
+        <div className="overflow-x-auto border-t border-hair-2">{board}</div>
       </div>
     </>
   );

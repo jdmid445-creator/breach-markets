@@ -4,7 +4,7 @@ import { positions, profile, standing, userTrades, short, displayName, type Peri
 import { usd, cents, ago, pmMarket, pmProfile } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
-import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified } from "@/components/desk/ui";
+import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified, Side } from "@/components/desk/ui";
 import { Soundings } from "@/components/desk/Soundings";
 import { CopyAddress } from "@/components/desk/CopyAddress";
 
@@ -54,7 +54,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
     <>
       <header className="mx-auto max-w-[1360px] px-5 pb-7 pt-32 sm:pt-24 md:px-8">
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
-          <Avatar src={image} seed={address} size={76} />
+          <Avatar src={image} seed={address} name={name} size={76} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h1 className="title truncate text-[clamp(30px,3.6vw,46px)] text-fg">{name}</h1>
@@ -89,36 +89,45 @@ export default async function TraderPage({ params }: { params: Promise<{ address
       </header>
 
       <div className="mx-auto max-w-[1360px] px-5 md:px-8">
-        {/* Profit by window */}
-        <dl className="grid grid-cols-2 overflow-hidden rounded-lg border border-hair bg-shoal md:grid-cols-4">
-          {PERIODS.map((p, i) => {
-            const s = stands[i];
-            return (
-              <div key={p.id} className={`px-5 py-4 ${i % 2 ? "border-l border-hair" : ""} ${i >= 2 ? "max-md:border-t md:border-l" : ""} border-hair`}>
-                <dt className="text-[13px] text-faint">Profit, {p.label.toLowerCase()}</dt>
-                <dd className="mt-1.5">
-                  {s ? (
-                    <Pnl value={s.pnl} className="text-[26px] leading-none">
-                      {usd(s.pnl, { sign: true })}
-                    </Pnl>
-                  ) : (
-                    <span className="fig text-[26px] leading-none text-faint">—</span>
-                  )}
-                  <div className="mt-2 flex items-center gap-2 text-[12.5px] text-faint">
-                    {s?.rankPnl ? <RankChip rank={s.rankPnl} /> : <span>Unranked</span>}
-                    <span className="fig">{s ? `${usd(s.volume)} volume` : ""}</span>
-                  </div>
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-12">
-          <Panel title="Their bets, charted" meta={`last ${Math.min(trades.length, 60)} trades`} className="lg:col-span-8">
+        <div className="grid gap-x-8 gap-y-10 lg:grid-cols-12">
+          <Panel framed className="self-start lg:col-span-8" title="Their bets, charted" meta={`last ${Math.min(trades.length, 60)} trades`}>
             <Soundings trades={trades} height={400} plain label={`${name}'s recent bets plotted by price and time`} />
           </Panel>
-          <div className="grid gap-4 lg:col-span-4">
+          <div className="grid content-start gap-10 lg:col-span-4">
+            <Panel title="Profit by window">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-hair text-[12.5px] text-faint">
+                    <th className="px-4 py-2 font-normal">Window</th>
+                    <th className="px-4 py-2 text-right font-normal">Profit</th>
+                    <th className="px-4 py-2 text-right font-normal">Rank</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {PERIODS.map((p, i) => {
+                    const st = stands[i];
+                    return (
+                      <tr key={p.id} className="border-b border-hair last:border-0">
+                        <td className="px-4 py-2.5 text-[14px] text-mist">
+                          {p.label}
+                          <span className="fig block text-[12.5px] text-faint">{st ? `${usd(st.volume)} volume` : "no volume"}</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-right">
+                          {st ? (
+                            <Pnl value={st.pnl} className="text-[17px]">
+                              {usd(st.pnl, { sign: true })}
+                            </Pnl>
+                          ) : (
+                            <span className="text-faint">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-2.5 text-right">{st?.rankPnl ? <RankChip rank={st.rankPnl} /> : <span className="text-[13px] text-faint">Unranked</span>}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </Panel>
             <Panel title="Right now" bodyClass="px-4 py-1">
               <dl className="divide-y divide-hair">
                 <Row label="Open positions" value={<span className="fig text-fg">{usd(openValue)}</span>} sub={`${pos.length} markets`} />
@@ -162,7 +171,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
 
         <section className="mt-12">
           <h2 className="title text-[24px] text-fg">Open positions</h2>
-          <div className="mt-4 overflow-hidden rounded-lg border border-hair bg-shoal">
+          <div className="mt-4 overflow-x-auto border-t border-hair-2">
             {pos.length === 0 ? (
               <Empty>No open positions right now.</Empty>
             ) : (
@@ -211,7 +220,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
 
         <section className="mt-12">
           <h2 className="title text-[24px] text-fg">Recent trades</h2>
-          <div className="mt-4 overflow-hidden rounded-lg border border-hair bg-shoal">
+          <div className="mt-4 overflow-x-auto border-t border-hair-2">
             {trades.length === 0 ? (
               <Empty>No recent trades.</Empty>
             ) : (
@@ -233,7 +242,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                           <span className="min-w-0">
                             <span className="block truncate text-[14px] text-fg group-hover:underline">{t.title}</span>
                             <span className="block text-[13px] text-faint">
-                              <span className={t.side === "BUY" ? "font-semibold text-up" : "font-semibold text-down"}>{t.side === "BUY" ? "Bought" : "Sold"}</span>{" "}
+                              <Side side={t.side} />{" "}
                               <span className="text-mist">{t.outcome}</span> at <span className="fig">{cents(t.price)}</span>
                             </span>
                           </span>
@@ -272,7 +281,7 @@ function PriceTrack({ from, to }: { from: number; to: number }) {
   return (
     <span className="relative block h-[6px] flex-1 rounded-full bg-reef" aria-hidden>
       <span
-        className={`absolute inset-y-0 rounded-full ${up ? "bg-up/70" : "bg-down/70"}`}
+        className={`absolute inset-y-0 rounded-full ${up ? "bg-stone-hi/80" : "bg-faint/80"}`}
         style={{ left: `${Math.min(a, b)}%`, width: `${Math.max(1.5, Math.abs(b - a))}%` }}
       />
       <span className="absolute -top-[3px] h-[12px] w-[2px] rounded-full bg-fg" style={{ left: `${a}%` }} />

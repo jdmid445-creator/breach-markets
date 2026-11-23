@@ -9,6 +9,7 @@ export function Panel({
   href,
   hrefLabel,
   live,
+  framed = false,
   className = "",
   bodyClass = "",
   children,
@@ -18,13 +19,15 @@ export function Panel({
   href?: string;
   hrefLabel?: string;
   live?: boolean;
+  /** Only the chart gets a frame; every other work area sits on a hairline rule. */
+  framed?: boolean;
   className?: string;
   bodyClass?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className={`flex min-w-0 flex-col rounded-lg border border-hair bg-shoal ${className}`}>
-      <header className="flex min-h-12 shrink-0 items-center gap-2.5 border-b border-hair px-4">
+    <section className={`flex min-w-0 flex-col ${framed ? "rounded-lg border border-hair-2 bg-shoal" : "border-t border-hair-2"} ${className}`}>
+      <header className="flex min-h-11 shrink-0 items-center gap-2.5 border-b border-hair px-4">
         {live && <span className="live-dot shrink-0" aria-label="Live" />}
         <h2 className="text-[14.5px] font-semibold text-fg">{title}</h2>
         {meta && <span className="truncate text-[13px] text-faint max-sm:hidden">{meta}</span>}
@@ -75,7 +78,7 @@ export function RankChip({ rank, size = "sm" }: { rank: number; size?: "sm" | "m
 }
 
 export function SideTag({ side }: { side: "BUY" | "SELL" }) {
-  return <span className={`text-[13px] font-semibold ${side === "BUY" ? "text-up" : "text-down"}`}>{side === "BUY" ? "Bought" : "Sold"}</span>;
+  return <Side side={side} />;
 }
 
 /** Polymarket's own market image, or a quiet placeholder tile. */
@@ -105,5 +108,15 @@ export function Verified() {
 
 /** Up/down coloured signed money. */
 export function Pnl({ value, children, className = "" }: { value: number; children: React.ReactNode; className?: string }) {
-  return <span className={`fig font-semibold ${value >= 0 ? "text-up" : "text-down"} ${className}`}>{children}</span>;
+  return <span className={`fig font-semibold ${value >= 0 ? "text-stone-hi" : "text-mist"} ${className}`}>{children}</span>;
+}
+
+/** One code for buy and sell everywhere, the chart's: bought in stone, sold underlined. */
+export function Side({ side, lower = false }: { side: "BUY" | "SELL"; lower?: boolean }) {
+  const word = side === "BUY" ? "Bought" : "Sold";
+  return side === "BUY" ? (
+    <span className="font-semibold text-stone-hi">{lower ? word.toLowerCase() : word}</span>
+  ) : (
+    <span className="font-semibold text-fg underline decoration-1 underline-offset-[3px]">{lower ? word.toLowerCase() : word}</span>
+  );
 }

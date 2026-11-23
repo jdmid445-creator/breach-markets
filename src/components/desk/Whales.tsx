@@ -7,7 +7,7 @@ import { usd, cents, ago, tier, pmMarket } from "@/lib/format";
 import { bucketLabel, isSport } from "@/lib/sports";
 import { useWhales, useNow } from "@/lib/useWhales";
 import { Soundings } from "./Soundings";
-import { MarketIcon, RankChip, Empty, Panel } from "./ui";
+import { MarketIcon, RankChip, Empty, Panel, Side } from "./ui";
 
 const MARKETS = [
   { id: "all", label: "All" },
@@ -47,6 +47,7 @@ export function HomeLive({ initial }: { initial: Trade[] }) {
 
       <div className="grid gap-4 lg:grid-cols-12">
         <Panel
+          framed
           title="Whale chart"
           meta={biggest ? <>biggest this hour {usd(biggest.usd)} by {biggest.name}</> : "last 70 whale bets"}
           live={status === "live"}
@@ -91,7 +92,7 @@ export function WhaleList({ trades, fresh, now }: { trades: Trade[]; fresh?: Set
                   </Link>
                 </div>
                 <div className="mt-0.5 truncate text-[13px] text-faint">
-                  <span className={t.side === "BUY" ? "text-up" : "text-down"}>{t.side === "BUY" ? "Bought" : "Sold"}</span>{" "}
+                  <Side side={t.side} />{" "}
                   <span className="text-mist">{t.outcome}</span> at <span className="fig">{cents(t.price)}</span> · {t.title}
                 </div>
               </div>
@@ -145,7 +146,7 @@ export function LiveDesk({ initial }: { initial: Trade[] }) {
   return (
     <div className="mx-auto max-w-[1360px] px-5 md:px-8">
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-hair bg-shoal px-3 py-3 sm:px-4">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-hair py-3">
         <ButtonGroup label="Market" value={market} onChange={setMarket} options={MARKETS.map((m) => ({ value: m.id, label: m.label }))} />
         <ButtonGroup
           label="Side"
@@ -225,11 +226,11 @@ export function LiveDesk({ initial }: { initial: Trade[] }) {
       </p>
 
       <div className="mt-4 grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.75fr)]">
-        <div className="overflow-hidden rounded-lg border border-hair bg-shoal">
+        <div className="overflow-x-auto border-t border-hair-2">
           <WhaleTable trades={shown} fresh={fresh} now={now} />
         </div>
-        <div className="lg:sticky lg:top-[76px]">
-          <Panel title="Whale chart" meta="the bets on the left, by price and time">
+        <div className="max-lg:order-first lg:sticky lg:top-[76px]">
+          <Panel framed title="Whale chart" meta="the bets on the left, by price and time">
             <Soundings trades={shown} fresh={fresh} height={520} />
           </Panel>
         </div>
@@ -269,7 +270,7 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
                         {t.name}
                       </Link>
                       <span className="text-[13.5px] text-faint">
-                        <span className={t.side === "BUY" ? "font-semibold text-up" : "font-semibold text-down"}>{t.side === "BUY" ? "bought" : "sold"}</span>{" "}
+                        <Side side={t.side} lower />{" "}
                         <span className="text-fg">{t.outcome || "?"}</span> at <span className="fig text-fg">{cents(t.price)}</span>
                       </span>
                     </div>

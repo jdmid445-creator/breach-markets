@@ -17,7 +17,7 @@ export function CopyAddress({ address }: { address: string }) {
       aria-label={done ? "Address copied" : "Copy wallet address"}
     >
       {address.slice(0, 6)}…{address.slice(-4)}
-      {done ? <Check size={13} className="text-up" /> : <Copy size={13} />}
+      {done ? <Check size={13} className="text-stone-hi" /> : <Copy size={13} />}
     </button>
   );
 }

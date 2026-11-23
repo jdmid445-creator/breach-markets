@@ -3,7 +3,7 @@ import { bigTrades, leaderboard } from "@/lib/pm";
 import { usd, cents, pmMarket } from "@/lib/format";
 import { ScrollIntro } from "@/components/ScrollIntro";
 import { HomeLive } from "@/components/desk/Whales";
-import { MiniBoard } from "@/components/desk/Boards";
+import { BoardSwitch } from "@/components/desk/BoardSwitch";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
 import { Avatar } from "@/components/Avatar";
 import { podConsensus } from "@/lib/smart";
@@ -46,26 +46,22 @@ export default async function Home() {
       <div className="mx-auto max-w-[1360px] px-5 pt-10 md:px-8">
         <HomeLive initial={trades} />
 
-        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <Panel title="Top profit" meta="7 days, all markets" href="/leaderboard?w=week" hrefLabel="Top 100">
-            <MiniBoard rows={weekly} />
-          </Panel>
-          <Panel title="Politics" meta="7 days" href="/leaderboard?cat=politics&w=week" hrefLabel="Board">
-            <MiniBoard rows={politics} />
-          </Panel>
-          <Panel title="Sports" meta="7 days" href="/leaderboard?cat=sports&w=week" hrefLabel="Board" className="md:col-span-2 xl:col-span-1">
-            <MiniBoard rows={sports} />
-          </Panel>
-        </div>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-12">
-          <Panel title="Smart money" meta="bets the month’s top 15 traders share" href="/smart-money" hrefLabel="All shared bets" className="lg:col-span-8">
+        <div className="mt-14 grid gap-x-8 gap-y-12 lg:grid-cols-12">
+          <BoardSwitch
+            className="lg:col-span-5"
+            boards={[
+              { id: "overall", label: "All markets", href: "/leaderboard?w=week", rows: weekly },
+              { id: "politics", label: "Politics", href: "/leaderboard?cat=politics&w=week", rows: politics },
+              { id: "sports", label: "Sports", href: "/leaderboard?cat=sports&w=week", rows: sports },
+            ]}
+          />
+          <Panel title="Smart money" meta="bets the month’s top 15 traders share" href="/smart-money" hrefLabel="All shared bets" className="lg:col-span-7">
             {pod.length === 0 ? (
               <Empty>None of the top traders share a position right now.</Empty>
             ) : (
               <ul>
                 {pod.slice(0, 6).map((p) => (
-                  <li key={p.key} className="row grid grid-cols-[34px_1fr_auto] items-center gap-4 border-b border-hair px-4 py-3 last:border-0 sm:grid-cols-[34px_1fr_150px_auto]">
+                  <li key={p.key} className="row grid grid-cols-[34px_1fr_auto] items-center gap-4 border-b border-hair px-4 py-3 last:border-0 sm:grid-cols-[34px_1fr_120px_96px]">
                     <MarketIcon src={p.icon} label={p.title} size={34} />
                     <div className="min-w-0">
                       <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="block truncate text-[14.5px] text-fg hover:underline">
@@ -76,14 +72,21 @@ export default async function Home() {
                       </div>
                     </div>
                     <div className="hidden items-center gap-2 sm:flex">
-                      <span className="flex -space-x-2">
-                        {p.whales.slice(0, 5).map(({ t }) => (
-                          <Link key={t.address} href={`/trader/${t.address}`} title={t.name} className="rounded-full ring-2 ring-shoal transition-transform duration-150 hover:z-10 hover:-translate-y-0.5">
-                            <Avatar src={t.image} seed={t.address} size={24} />
-                          </Link>
-                        ))}
+                      {p.whales.some(({ t }) => t.image) && (
+                        <span className="flex -space-x-2">
+                          {p.whales
+                            .filter(({ t }) => t.image)
+                            .slice(0, 5)
+                            .map(({ t }) => (
+                              <Link key={t.address} href={`/trader/${t.address}`} title={t.name} className="rounded-full ring-2 ring-sea transition-transform duration-150 hover:z-10 hover:-translate-y-0.5">
+                                <Avatar src={t.image} seed={t.address} name={t.name} size={24} />
+                              </Link>
+                            ))}
+                        </span>
+                      )}
+                      <span className="whitespace-nowrap text-[13px] text-mist">
+                        <span className="fig font-semibold text-fg">{p.whales.length}</span> of 15
                       </span>
-                      <span className="fig text-[13px] text-mist">{p.whales.length}</span>
                     </div>
                     <div className="fig text-right text-[15px] font-semibold text-fg">{usd(p.value)}</div>
                   </li>
@@ -92,38 +95,43 @@ export default async function Home() {
             )}
           </Panel>
 
-          <Panel title="Where the money is" meta="by market type, recent whale bets" className="lg:col-span-4" bodyClass="p-4">
+          <Panel title="Where the money is" meta="the recent whale bets above" className="lg:col-span-12" bodyClass="grid gap-x-16 gap-y-8 px-4 py-5 md:grid-cols-2">
             {mixTop.length === 0 ? (
               <Empty>No whale bets yet.</Empty>
             ) : (
               <>
-                <div className="flex h-3 w-full gap-[2px] overflow-hidden rounded-full">
-                  {mixTop.map(([k, v], i) => (
-                    <span key={k} className="bar-in h-full" style={{ width: `${(v / mixTotal) * 100}%`, background: SHADES[i], animationDelay: `${i * 60}ms` }} />
-                  ))}
+                <div>
+                  <h3 className="text-[13px] text-mist">By market type</h3>
+                  <div className="mt-3 flex h-3 w-full gap-[2px] overflow-hidden rounded-full">
+                    {mixTop.map(([k, v], i) => (
+                      <span key={k} className="bar-in h-full" style={{ width: `${(v / mixTotal) * 100}%`, background: SHADES[i], animationDelay: `${i * 60}ms` }} />
+                    ))}
+                  </div>
+                  <ul className="mt-4 grid gap-2.5">
+                    {mixTop.map(([k, v], i) => (
+                      <li key={k} className="flex items-center gap-3 text-[14px]">
+                        <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: SHADES[i] }} />
+                        <span className="text-fg">{k}</span>
+                        <span className="fig ml-auto text-mist">{usd(v)}</span>
+                        <span className="fig w-11 text-right font-semibold text-fg">{Math.round((v / mixTotal) * 100)}%</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="mt-4 grid gap-2.5">
-                  {mixTop.map(([k, v], i) => (
-                    <li key={k} className="flex items-center gap-3 text-[14px]">
-                      <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: SHADES[i] }} />
-                      <span className="text-fg">{k}</span>
-                      <span className="fig ml-auto text-mist">{usd(v)}</span>
-                      <span className="fig w-11 text-right font-semibold text-fg">{Math.round((v / mixTotal) * 100)}%</span>
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="mt-6 border-t border-hair pt-4 text-[13px] text-faint">Bet sizes, same bets</h3>
-                <ul className="mt-3 grid gap-2">
-                  {SIZES.map((b, i) => (
-                    <li key={b.label} className="grid grid-cols-[104px_1fr_28px] items-center gap-3 text-[13.5px]">
-                      <span className="text-mist">{b.label}</span>
-                      <span className="h-[6px] rounded-full bg-reef">
-                        <span className="bar-in block h-full rounded-full bg-stone" style={{ width: `${Math.max(2, (b.n / sizeMax) * 100)}%`, animationDelay: `${i * 60}ms` }} />
-                      </span>
-                      <span className="fig text-right font-semibold text-fg">{b.n}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  <h3 className="text-[13px] text-mist">By bet size</h3>
+                  <ul className="mt-3 grid gap-3">
+                    {SIZES.map((b, i) => (
+                      <li key={b.label} className="grid grid-cols-[112px_1fr_32px] items-center gap-3 text-[14px]">
+                        <span className="text-fg">{b.label}</span>
+                        <span className="h-[6px] rounded-full bg-reef">
+                          <span className="bar-in block h-full rounded-full bg-stone" style={{ width: `${Math.max(2, (b.n / sizeMax) * 100)}%`, animationDelay: `${i * 60}ms` }} />
+                        </span>
+                        <span className="fig text-right font-semibold text-fg">{b.n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </>
             )}
           </Panel>

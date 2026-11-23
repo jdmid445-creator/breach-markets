@@ -14,16 +14,16 @@ export function MiniBoard({ rows }: { rows: Trader[] | null }) {
     <ol>
       {list.map((t, i) => (
         <li key={t.address} className="border-b border-hair last:border-0">
-          <Link href={`/trader/${t.address}`} className="row grid grid-cols-[22px_26px_1fr_auto] items-center gap-3 px-3 py-2.5 sm:px-4">
+          <Link href={`/trader/${t.address}`} className="row grid grid-cols-[22px_26px_1fr_88px] items-center gap-3 px-3 py-2.5 sm:px-4">
             <span className={`fig text-[13px] ${i < 3 ? "font-semibold text-fg" : "text-faint"}`}>{i + 1}</span>
-            <Avatar src={t.image} seed={t.address} size={26} />
+            <Avatar src={t.image} seed={t.address} name={t.name} size={26} />
             <span className="min-w-0">
               <span className="block truncate text-[14px] text-fg">{t.name}</span>
               <span className="mt-1.5 block h-[3px] rounded-full bg-reef">
                 <span className="bar-in block h-full rounded-full bg-stone" style={{ width: `${Math.max(3, (Math.abs(t.pnl) / max) * 100)}%`, animationDelay: `${i * 40}ms` }} />
               </span>
             </span>
-            <Pnl value={t.pnl} className="text-[14px]">
+            <Pnl value={t.pnl} className="text-right text-[14px]">
               {usd(t.pnl, { sign: true })}
             </Pnl>
           </Link>
@@ -64,7 +64,7 @@ export function TraderTable({ rows, sort, sortHref }: { rows: Trader[]; sort: "P
               </td>
               <td className="w-full max-w-0 px-3 py-3 sm:px-4">
                 <Link href={`/trader/${t.address}`} className="group flex min-w-0 items-center gap-3">
-                  <Avatar src={t.image} seed={t.address} size={36} />
+                  <Avatar src={t.image} seed={t.address} name={t.name} size={36} />
                   <span className="min-w-0">
                     <span className="flex items-center gap-1.5">
                       <span className={`truncate group-hover:underline ${podium ? "text-[16px] font-semibold" : "text-[14.5px] font-semibold"} text-fg`}>{t.name}</span>
@@ -77,7 +77,7 @@ export function TraderTable({ rows, sort, sortHref }: { rows: Trader[]; sort: "P
               <td className="px-3 py-3 sm:px-4 max-md:hidden">
                 <span className="block h-[5px] rounded-full bg-reef">
                   <span
-                    className={`bar-in block h-full rounded-full ${v >= 0 ? "bg-stone" : "bg-down/80"}`}
+                    className={`bar-in block h-full rounded-full ${v >= 0 ? "bg-stone" : "bg-faint"}`}
                     style={{ width: `${Math.max(2, (Math.abs(v) / max) * 100)}%`, animationDelay: `${Math.min(i, 15) * 25}ms` }}
                   />
                 </span>
@@ -126,7 +126,7 @@ export function FlowTable({ rows }: { rows: FlowRow[] }) {
             <td className={`fig px-3 py-3 sm:px-4 ${i < 3 ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{i + 1}</td>
             <td className="w-full max-w-0 px-3 py-3 sm:px-4">
               <Link href={`/trader/${r.address}`} className="group flex min-w-0 items-center gap-3">
-                <Avatar src={r.image} seed={r.address} size={34} />
+                <Avatar src={r.image} seed={r.address} name={r.name} size={34} />
                 <span className="min-w-0">
                   <span className="block truncate text-[14.5px] font-semibold text-fg group-hover:underline">{r.name}</span>
                   <span className="block truncate text-[12.5px] text-faint">

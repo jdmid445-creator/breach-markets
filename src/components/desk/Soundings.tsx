@@ -5,7 +5,7 @@ import { contourDensity } from "d3-contour";
 import { geoPath } from "d3-geo";
 import type { Trade } from "@/lib/pm";
 import { usd, cents, ago } from "@/lib/format";
-import { RankChip } from "./ui";
+import { RankChip, Side } from "./ui";
 
 const M = { t: 18, r: 18, b: 34, l: 50 };
 const BAND = 5; // graduation band thickness, the chart's neatline
@@ -66,7 +66,7 @@ export function Soundings({
         if (!e.isIntersecting) return;
         io.disconnect();
         setPhase("in");
-        t = setTimeout(() => setPhase("done"), 1400);
+        t = setTimeout(() => setPhase("done"), 1000);
       },
       { threshold: 0.35 },
     );
@@ -119,14 +119,12 @@ export function Soundings({
     const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
     const thin = new Set<string>();
     for (const p of [...pts].reverse()) {
-      const half = (p.text.length * p.size * 0.56) / 2 + (p.t.rank !== null ? 8 : 0);
-      const b = { x0: p.x - half, x1: p.x + half, y0: p.y - p.size * 0.48, y1: p.y + p.size * 0.48 };
-      const area = (b.x1 - b.x0) * (b.y1 - b.y0);
-      const hit = placed.some((o) => {
-        const ix = Math.max(0, Math.min(b.x1, o.x1) - Math.max(b.x0, o.x0));
-        const iy = Math.max(0, Math.min(b.y1, o.y1) - Math.max(b.y0, o.y0));
-        return ix * iy > area * 0.04;
-      });
+      const pad = 4;
+      const ring = p.t.rank !== null && p.t.rank <= 10 && !plain ? 4 : 0;
+      const half = (p.text.length * p.size * 0.56) / 2 + pad + ring;
+      const left = p.t.rank !== null && !plain && !ring ? 10 : 0; // room for the rank mark
+      const b = { x0: p.x - half - left, x1: p.x + half, y0: p.y - p.size * 0.5 - pad, y1: p.y + p.size * 0.62 + pad };
+      const hit = placed.some((o) => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
       if (hit) thin.add(p.t.id);
       else placed.push(b);
     }
@@ -146,7 +144,7 @@ export function Soundings({
     const ticksX: { x: number; label: string }[] = [];
     for (let s = 0; t1 - s >= t0; s += step) ticksX.push({ x: x(t1 - s), label: s === 0 ? "now" : `${span(s)} ago` });
     return { iw, ih, pts, contours, ticksX, t0, t1, max, thin };
-  }, [trades, w, h, now, limit]);
+  }, [trades, w, h, now, limit, plain]);
 
   const hovered = model?.pts.find((p) => p.t.id === hover) ?? null;
 
@@ -154,7 +152,7 @@ export function Soundings({
     <figure className="m-0">
       <div ref={box} className="relative w-full select-none" style={{ height: h }}>
         {model && w && (
-          <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="group" aria-label={label} className={`block ${phase === "wait" ? "[&_.fig-layer]:opacity-0" : ""}`}>
+          <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="group" aria-label={label} className="block">
             <defs>
               <clipPath id="sea">
                 <rect x={M.l} y={M.t} width={model.iw} height={model.ih} />
@@ -167,7 +165,7 @@ export function Soundings({
               {model.contours.map((c) => (
                 <path
                   className={entering ? "contour-in" : undefined}
-                  style={entering ? { animationDelay: `${300 + c.i * 60}ms` } : undefined}
+                  style={entering ? { animationDelay: `${c.i * 50}ms` } : undefined}
                   key={c.i}
                   d={c.d}
                   fill="#639cc5"
@@ -187,7 +185,7 @@ export function Soundings({
             <rect x={M.l} y={M.t} width={model.iw} height={model.ih} fill="none" stroke="#255582" />
             {Array.from({ length: 20 }, (_, i) =>
               i % 2 ? (
-                <g key={`gy${i}`} fill="#639cc5" opacity={0.75}>
+                <g key={`gy${i}`} fill="#8dbbe0" opacity={0.9}>
                   <rect x={M.l - BAND - 0.5} y={M.t + (i / 20) * model.ih} width={BAND} height={model.ih / 20} />
                   <rect x={M.l + model.iw + 0.5} y={M.t + (i / 20) * model.ih} width={BAND} height={model.ih / 20} />
                 </g>
@@ -201,7 +199,7 @@ export function Soundings({
                     const seg = Math.max(0, t.x - next) / 2;
                     const x0 = next + half * seg;
                     return half === 1 ? (
-                      <g key={half} fill="#639cc5" opacity={0.75}>
+                      <g key={half} fill="#8dbbe0" opacity={0.9}>
                         <rect x={x0} y={M.t + model.ih + 0.5} width={seg} height={BAND} />
                         <rect x={x0} y={M.t - BAND - 0.5} width={seg} height={BAND} />
                       </g>
@@ -219,6 +217,9 @@ export function Soundings({
                 {c}¢
               </text>
             ))}
+
+            {/* survey pass: one sweep across the chart when it first comes into view */}
+            {entering && <rect x={M.l} y={M.t} width={2} height={model.ih} fill="#8dbbe0" className="sweep" style={{ ["--sweep" as string]: `${model.iw}px` }} />}
 
             {/* soundings */}
             <g clipPath="url(#sea)" className="fig-layer">
@@ -240,12 +241,8 @@ export function Soundings({
                     onBlur={() => setHover((v) => (v === p.t.id ? null : v))}
                     onClick={() => router.push(`/trader/${p.t.wallet}`)}
                     onKeyDown={(e) => e.key === "Enter" && router.push(`/trader/${p.t.wallet}`)}
-                    className={`cursor-pointer outline-none ${entering ? "sound-in" : ""}`}
-                    style={{
-                      opacity: dim ? 0.22 : 1,
-                      transition: "opacity 160ms cubic-bezier(.23,1,.32,1)",
-                      animationDelay: entering ? `${Math.round(((p.x - M.l) / model.iw) * 700)}ms` : undefined,
-                    }}
+                    className="cursor-pointer outline-none"
+                    style={{ opacity: dim ? 0.22 : 1, transition: "opacity 160ms cubic-bezier(.23,1,.32,1)" }}
                   >
                     <circle cx={p.x} cy={p.y} r={Math.max(12, p.size)} fill="transparent" />
                     {fresh?.has(p.t.id) && (
@@ -255,16 +252,11 @@ export function Soundings({
                       <circle cx={p.x} cy={p.y} r={elite ? 3 : 2} fill={elite ? "#eb2f33" : fill} opacity={elite ? 1 : 0.7} />
                     ) : (
                     <>
-                    {r !== null && (
-                      <circle
-                        cx={p.x - tw / 2 - 6}
-                        cy={p.y}
-                        r={elite ? 3.6 : 3}
-                        fill={elite ? "#eb2f33" : "none"}
-                        stroke={elite ? "none" : "#8dbbe0"}
-                        strokeWidth="1.3"
-                      />
+                    {elite && (
+                      // the chart's danger mark: a dotted ring around the sounding
+                      <ellipse cx={p.x} cy={p.y} rx={tw / 2 + 7} ry={p.size * 0.72 + 4} fill="none" stroke="#eb2f33" strokeWidth="1.4" strokeDasharray="1.2 2.6" strokeLinecap="round" />
                     )}
+                    {r !== null && !elite && <circle cx={p.x - tw / 2 - 6} cy={p.y} r={3} fill="none" stroke="#8dbbe0" strokeWidth="1.3" />}
                     <text
                       x={p.x}
                       y={p.y}
@@ -311,7 +303,7 @@ export function Soundings({
               <span className="fig ml-auto text-[15px] font-semibold text-fg">{usd(hovered.t.usd)}</span>
             </div>
             <div className="mt-1.5 text-[13px] text-mist">
-              <span className={hovered.t.side === "BUY" ? "text-up" : "text-down"}>{hovered.t.side === "BUY" ? "Bought" : "Sold"}</span> {hovered.t.outcome} at{" "}
+              <Side side={hovered.t.side} /> {hovered.t.outcome} at{" "}
               <span className="fig text-fg">{cents(hovered.t.price)}</span>
               {now !== null && <span className="text-faint"> · {ago(hovered.t.ts, now)} ago</span>}
             </div>
@@ -321,13 +313,13 @@ export function Soundings({
       </div>
       <figcaption className="flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-hair px-4 py-2.5 text-[12.5px] text-faint">
         <span>
-          Figures are bet size in <span className="text-mist">$K</span> at the price it filled
+          Soundings in <span className="text-mist">$K</span>, set at the price each bet filled
         </span>
         {!plain && (
           <>
         <span className="flex items-center gap-1.5">
-          <svg width="9" height="9" aria-hidden>
-            <circle cx="4.5" cy="4.5" r="3.6" fill="#eb2f33" />
+          <svg width="16" height="12" aria-hidden>
+            <ellipse cx="8" cy="6" rx="6.6" ry="4.6" fill="none" stroke="#eb2f33" strokeWidth="1.3" strokeDasharray="1.2 2.4" strokeLinecap="round" />
           </svg>
           Top-10 trader
         </span>
