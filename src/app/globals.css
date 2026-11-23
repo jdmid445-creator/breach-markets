@@ -147,3 +147,6 @@ body::after {
 @media (prefers-reduced-motion: reduce) { .row-in, .bar-in { animation: none; } }
 
 .glass { background: rgba(16,23,58,.72); backdrop-filter: blur(14px); border: 1px solid var(--color-line); }
+
+/* Never flash the nav over the homepage intro before JS decides */
+body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: translateY(-100%); }

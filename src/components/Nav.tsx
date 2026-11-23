@@ -12,27 +12,34 @@ const LINKS = [
 
 export function Nav() {
   const path = usePathname();
-  const home = path === "/";
-  // On the homepage the nav stays hidden until the intro has fully played out
-  const [shown, setShown] = useState(!home);
+  // While the homepage intro is on screen the nav stays hidden; it slides in
+  // once the intro has played out. Detected from the #intro element itself so
+  // it works no matter how the route is reported.
+  const [shown, setShown] = useState(true);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!home) return setShown(true);
     const check = () => {
       const intro = document.getElementById("intro");
-      const end = intro ? intro.offsetTop + intro.offsetHeight - window.innerHeight * 0.6 : 0;
+      setReady(true);
+      if (!intro) return setShown(true);
+      const end = intro.offsetTop + intro.offsetHeight - window.innerHeight * 0.6;
       setShown(window.scrollY > end);
     };
     check();
+    const t = setTimeout(check, 50);
     window.addEventListener("scroll", check, { passive: true });
     window.addEventListener("resize", check);
     return () => {
+      clearTimeout(t);
       window.removeEventListener("scroll", check);
       window.removeEventListener("resize", check);
     };
-  }, [home]);
+  }, [path]);
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 border-b hairline bg-ink/85 backdrop-blur-md transition-[transform,opacity] duration-500 ease-[cubic-bezier(.2,.8,.2,1)] ${
+      data-nav
+      data-shown={shown ? "true" : "false"}
+      className={`${ready ? "nav-ready " : ""}fixed inset-x-0 top-0 z-40 border-b hairline bg-ink/85 backdrop-blur-md transition-[transform,opacity] duration-500 ease-[cubic-bezier(.2,.8,.2,1)] ${
         shown ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-full opacity-0"
       }`}
     >
