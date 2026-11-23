@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search, User, ArrowRight } from "lucide-react";
 
 type Row = { address: string; name: string; rank: number; pnl: number };
 type Item = { kind: "page" | "trader"; label: string; sub: string; href: string };
@@ -83,10 +84,16 @@ export function CommandPalette() {
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-black/60 px-4 pt-[14vh]" onClick={() => setOpen(false)}>
-      <div className="w-full max-w-[620px] border border-t-line bg-t-panel" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Search">
-        <div className="flex items-center gap-3 border-b border-t-line px-4">
-          <span className="t-mono text-t-amber">&gt;</span>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[rgba(1,12,24,.6)] px-4 pt-[14vh] backdrop-blur-[2px]" onClick={() => setOpen(false)}>
+      <div
+        className="tip-in w-full max-w-[600px] overflow-hidden rounded-xl border border-hair-2 bg-shoal shadow-[0_24px_60px_rgba(0,8,20,.55)]"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search traders and pages"
+      >
+        <div className="flex items-center gap-3 border-b border-hair px-4">
+          <Search size={17} className="shrink-0 text-faint" />
           <input
             ref={input}
             value={q}
@@ -95,37 +102,39 @@ export function CommandPalette() {
               setSel(0);
             }}
             onKeyDown={(e) => {
-              if (e.key === "ArrowDown") (e.preventDefault(), setSel((v) => Math.min(items.length - 1, v + 1)));
-              if (e.key === "ArrowUp") (e.preventDefault(), setSel((v) => Math.max(0, v - 1)));
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setSel((v) => Math.min(items.length - 1, v + 1));
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setSel((v) => Math.max(0, v - 1));
+              }
               if (e.key === "Enter") go(items[sel]);
               if (e.key === "Escape") setOpen(false);
             }}
             placeholder="Search a trader, paste a wallet, or jump to a page"
-            className="t-mono h-12 flex-1 bg-transparent text-[14px] text-t-text outline-none placeholder:text-t-dim"
+            aria-label="Search"
+            className="h-13 flex-1 bg-transparent py-4 text-[15px] text-fg outline-none placeholder:text-faint focus-visible:outline-none"
           />
-          <kbd className="t-mono rounded-[3px] border border-t-line px-1.5 text-[10.5px] text-t-dim">esc</kbd>
+          <kbd className="rounded border border-hair px-1.5 text-[11.5px] text-faint">Esc</kbd>
         </div>
-        <ul className="max-h-[50vh] overflow-y-auto py-1">
-          {items.length === 0 && <li className="t-mono px-4 py-6 text-[13px] text-t-dim">{traders === null ? "loading traders…" : "no match"}</li>}
+        <ul className="max-h-[50vh] overflow-y-auto p-1.5" role="listbox">
+          {items.length === 0 && <li className="px-3 py-6 text-center text-[14px] text-mist">{traders === null ? "Loading traders…" : "No trader or page matches that."}</li>}
           {items.map((it, i) => (
-            <li key={`${it.href}-${i}`}>
+            <li key={`${it.href}-${i}`} role="option" aria-selected={i === sel}>
               <button
                 onMouseEnter={() => setSel(i)}
                 onClick={() => go(it)}
-                className={`flex w-full items-center gap-3 px-4 py-2.5 text-left ${i === sel ? "bg-t-olive" : ""}`}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left ${i === sel ? "bg-reef" : ""}`}
               >
-                <span className={`t-mono w-14 text-[10.5px] ${it.kind === "trader" ? "text-t-amber" : "text-t-dim"}`}>{it.kind === "trader" ? "trader" : "page"}</span>
-                <span className="flex-1 truncate text-[14px] text-t-text">{it.label}</span>
-                <span className="t-mono truncate text-[11.5px] text-t-dim">{it.sub}</span>
+                {it.kind === "trader" ? <User size={16} className="shrink-0 text-stone-hi" /> : <ArrowRight size={16} className="shrink-0 text-faint" />}
+                <span className="flex-1 truncate text-[14.5px] text-fg">{it.label}</span>
+                <span className="fig truncate text-[12.5px] text-faint">{it.sub}</span>
               </button>
             </li>
           ))}
         </ul>
-        <div className="t-mono flex gap-4 border-t border-t-line px-4 py-2 text-[11px] text-t-dim">
-          <span>↑↓ move</span>
-          <span>↵ open</span>
-          <span className="ml-auto">A alerts · L boards · S smart money · H home</span>
-        </div>
       </div>
     </div>
   );

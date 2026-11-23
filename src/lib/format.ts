@@ -6,6 +6,8 @@ export function usd(n: number, opts: { sign?: boolean; compact?: boolean } = {})
   else if (compact && abs >= 1e6) s = `$${(abs / 1e6).toFixed(2)}M`;
   else if (compact && abs >= 1e4) s = `$${(abs / 1e3).toFixed(1)}K`;
   else s = `$${abs.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  // $10.0K → $10K, $5.80M → $5.8M, $5.00M → $5M
+  s = s.replace(/\.0+(?=[KMB])/, "").replace(/(\.\d)0(?=[MB])/, "$1");
   if (n < 0) return `−${s}`;
   return sign && n > 0 ? `+${s}` : s;
 }

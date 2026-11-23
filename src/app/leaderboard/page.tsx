@@ -1,22 +1,21 @@
 import { CATEGORIES, leaderboard, tradesSince, flowBoard, type Period, type SortBy } from "@/lib/pm";
 import { SPORTS } from "@/lib/sports";
-import { TraderTable, FlowTable } from "@/components/TraderTable";
-import { PageHero } from "@/components/PageHero";
-import { Segmented } from "@/components/Segmented";
-import { Podium } from "@/components/Podium";
+import { TraderTable, FlowTable } from "@/components/desk/Boards";
+import { PageHeader } from "@/components/desk/ui";
+import { Tabs, Segmented } from "@/components/desk/Tabs";
+import { SportSelect } from "@/components/desk/SportSelect";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leaderboards — Breach" };
 
 const WINDOWS = [
-  { id: "hour", label: "1H" },
-  { id: "day", label: "24H" },
-  { id: "week", label: "7D" },
-  { id: "month", label: "30D" },
-  { id: "all", label: "All time" },
+  { id: "hour", label: "1H", long: "the last hour" },
+  { id: "day", label: "24H", long: "the last 24 hours" },
+  { id: "week", label: "7D", long: "the last 7 days" },
+  { id: "month", label: "30D", long: "the last 30 days" },
+  { id: "all", label: "All time", long: "all time" },
 ] as const;
 type Win = (typeof WINDOWS)[number]["id"];
-
 type SP = Promise<Record<string, string | undefined>>;
 
 export default async function LeaderboardPage({ searchParams }: { searchParams: SP }) {
@@ -33,10 +32,11 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     return `/leaderboard?${qs}`;
   };
 
-  // Flow mode: 1H window or a specific sport. Polymarket only ranks profit for
-  // day/week/month/all and one combined "sports" bucket, so we compute these
-  // from the live $1K+ trade feed instead.
+  // Flow mode: 1H or a single sport. Polymarket only ranks profit for day/week/month/all
+  // and one combined sports bucket, so these cuts rank who moved the most money instead.
   const flowMode = win === "hour" || Boolean(sport);
+  const winInfo = WINDOWS.find((w) => w.id === win)!;
+  const scope = sport ? SPORTS.find((s) => s.id === sport)!.label : CATEGORIES.find((c) => c.id === cat)!.label;
   let board: React.ReactNode;
   let note: string;
 
@@ -48,56 +48,29 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
       sport ? t.bucket === sport : cat === "overall" ? true : cat === "sports" ? SPORTS.some((s) => s.id === t.bucket) : t.bucket === cat,
     );
     board = <FlowTable rows={flowBoard(filtered).slice(0, 100)} />;
-    note = `Ranked by money moved in $1K+ bets over the last ${WINDOWS.find((w) => w.id === win)!.label}${
-      sport ? ` in ${SPORTS.find((s) => s.id === sport)!.label}` : ""
-    }. Polymarket doesn’t publish profit for this cut, so this shows who’s acting, not who’s right yet.`;
+    note = `Who moved the most money in $1K+ bets over ${winInfo.long}. Polymarket doesn’t publish profit for this cut, so this shows who’s acting, not yet who’s right.`;
   } else {
     const rows = (await leaderboard({ period: win as Period, category: cat, sort, limit: 100 })) ?? [];
-    const podium = rows.length >= 3;
-    board = (
-      <>
-        {podium && (
-          <div className="mb-6">
-            <Podium rows={rows} />
-          </div>
-        )}
-        <TraderTable rows={rows} sort={sort} skip={podium ? 3 : 0} />
-      </>
-    );
-    note = sort === "PNL" ? "Ranked by profit in the window, straight from Polymarket." : "Ranked by trading volume in the window.";
+    board = <TraderTable rows={rows} sort={sort} sortHref={(s) => href({ sort: s })} />;
+    note = `The top 100 by ${sort === "PNL" ? "profit" : "volume"} over ${winInfo.long}, straight from Polymarket.`;
   }
-
-  const catLabel = CATEGORIES.find((c) => c.id === cat)!.label;
-
-  const winLabel = WINDOWS.find((w) => w.id === win)!.label;
-  const headline = `${sport ? SPORTS.find((s) => s.id === sport)!.label : catLabel} · ${winLabel}`;
 
   return (
     <>
-      <PageHero kicker="Leaderboards" title={headline} sub={note} compact>
-        <div className="flex flex-col gap-3">
-          <Segmented id="cat" label="market" items={CATEGORIES.map((c) => ({ href: href({ cat: c.id, sport: undefined }), label: c.label, active: c.id === cat }))} />
+      <PageHeader title={`${scope} leaderboard`} sub={note}>
+        <Tabs id="cat" label="Market" items={CATEGORIES.map((c) => ({ href: href({ cat: c.id, sport: undefined }), label: c.label, active: c.id === cat }))} />
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Segmented id="win" label="Window" items={WINDOWS.map((w) => ({ href: href({ w: w.id }), label: w.label, active: w.id === win }))} />
           {cat === "sports" && (
-            <Segmented
-              id="sport"
-              label="sport"
-              items={[{ href: href({ sport: undefined }), label: "All sports", active: !sport }, ...SPORTS.map((s) => ({ href: href({ sport: s.id }), label: s.label, active: s.id === sport }))]}
+            <SportSelect
+              value={sport ?? ""}
+              options={[{ value: "", label: "All sports", href: href({ sport: undefined }) }, ...SPORTS.map((s) => ({ value: s.id, label: s.label, href: href({ sport: s.id }) }))]}
             />
           )}
-          <div className="flex flex-wrap gap-3">
-            <Segmented id="win" label="window" items={WINDOWS.map((w) => ({ href: href({ w: w.id }), label: w.label, active: w.id === win }))} />
-            {!flowMode && (
-              <Segmented
-                id="sort"
-                label="rank by"
-                items={(["PNL", "VOLUME"] as const).map((x) => ({ href: href({ sort: x }), label: x === "PNL" ? "Profit" : "Volume", active: x === sort }))}
-              />
-            )}
-          </div>
         </div>
-      </PageHero>
-      <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1440px] px-5 pt-8">
-        {board}
+      </PageHeader>
+      <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1360px] px-5 md:px-8">
+        <div className="overflow-hidden rounded-lg border border-hair bg-shoal">{board}</div>
       </div>
     </>
   );

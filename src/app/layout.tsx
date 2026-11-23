@@ -3,14 +3,12 @@ import "@fontsource-variable/archivo/wdth.css";
 import "@fontsource/ibm-plex-sans/300.css";
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/500.css";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
 import "@fontsource-variable/hanken-grotesk";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/hanken-grotesk/wght-italic.css";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
-import { StatusBar } from "@/components/term/StatusBar";
-import { CommandPalette } from "@/components/term/CommandPalette";
+import { Footer } from "@/components/Footer";
+import { CommandPalette } from "@/components/desk/CommandPalette";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://breach-markets.vercel.app"),
@@ -33,7 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = { themeColor: "#0a0f26" };
+export const viewport = { themeColor: "#03203d" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -41,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <Nav />
         <main>{children}</main>
-        <StatusBar />
+        <Footer />
         <CommandPalette />
       </body>
     </html>

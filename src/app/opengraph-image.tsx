@@ -10,7 +10,7 @@ const TAIL =
 export default function OG() {
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0a0f26", padding: 72, color: "#eaf6f5" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#03203d", padding: 72, color: "#eef3f8" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <svg width="72" height="72" viewBox="0 0 64 64">
             <rect width="64" height="64" rx="15" fill="#105BFF" />
@@ -20,9 +20,9 @@ export default function OG() {
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 82, lineHeight: 1.02, fontWeight: 300, maxWidth: 980 }}>See the whales before the market does.</div>
-          <div style={{ marginTop: 28, fontSize: 30, color: "#8e98c0" }}>Live $10K+ Polymarket bets, ranked traders, and what the top wallets hold.</div>
+          <div style={{ marginTop: 28, fontSize: 30, color: "#a3bdd4" }}>Live $10K+ Polymarket bets, ranked traders, and what the top wallets hold.</div>
         </div>
-        <div style={{ display: "flex", height: 8, width: 220, background: "#74ffed", borderRadius: 4 }} />
+        <div style={{ display: "flex", height: 8, width: 220, background: "#639cc5", borderRadius: 4 }} />
       </div>
     ),
     size,
