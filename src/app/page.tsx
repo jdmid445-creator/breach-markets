@@ -6,17 +6,21 @@ import { WhaleFeed } from "@/components/WhaleFeed";
 import { Avatar } from "@/components/Avatar";
 import { BubblePool } from "@/components/BubblePool";
 import { ScrollIntro } from "@/components/ScrollIntro";
-import { Reveal, CountUp, Magnetic, Tilt } from "@/components/fx";
+import { Reveal, Magnetic } from "@/components/fx";
 import { TextReveal } from "@/components/unlumen/text-reveal";
+import { WaterConsole } from "@/components/WaterConsole";
+import { podConsensus } from "@/lib/smart";
 
 export const revalidate = 30;
 
 export default async function Home() {
-  const [feed, overall, politics, sports] = await Promise.all([
+  const [feed, overall, politics, sports, weekly, pod] = await Promise.all([
     bigTrades(10_000, 60, 10),
     leaderboard({ period: "day", category: "overall", sort: "PNL", limit: 5 }),
     leaderboard({ period: "week", category: "politics", sort: "PNL", limit: 5 }),
     leaderboard({ period: "week", category: "sports", sort: "PNL", limit: 5 }),
+    leaderboard({ period: "week", category: "overall", sort: "PNL", limit: 6 }),
+    podConsensus(15).catch(() => []),
   ]);
   const trades = feed ?? [];
   const moved = trades.reduce((s, t) => s + t.usd, 0);
@@ -34,45 +38,11 @@ export default async function Home() {
 
       <Tape trades={trades} />
 
-      {/* Scene 1 (light studio): what Breach reads */}
-      <section className="scene-light">
-        <div className="mx-auto max-w-[1240px] px-5 py-28">
-          <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2b8f86]">Read the water</p>
-          <TextReveal
-            as="h2"
-            text="Polymarket shows you the odds. Breach shows you who’s moving them."
-            className="display mt-5 max-w-[1050px] text-[clamp(38px,5.6vw,80px)] !leading-[0.98]"
-            staggerDelay={0.045}
-          />
-          <div className="mt-16 grid gap-5 md:grid-cols-3">
-            {[
-              { k: "01", t: "Live whales", d: "Every $10K+ bet the second it lands, sized, tiered and filterable by sport, politics or crypto.", h: "/live", stat: <CountUp value={trades.length} format="int" />, sl: "bets in the latest pull" },
-              { k: "02", t: "Leaderboards", d: "Top traders by profit for 24H, 7D, 30D and all time, across 11 categories and 11 individual sports.", h: "/leaderboard", stat: <CountUp value={22} format="int" />, sl: "boards to dig through" },
-              { k: "03", t: "Smart money", d: "Markets where two or more of the month’s top 30 traders hold the same side.", h: "/smart-money", stat: <CountUp value={30} format="int" />, sl: "sharpest wallets tracked" },
-            ].map((c, i) => (
-              <Reveal key={c.k} delay={i * 120}>
-                <Tilt className="group rounded-3xl">
-                  <Link href={c.h} className="block rounded-3xl border border-[#cfdedd] bg-white/70 p-7 shadow-[0_20px_60px_-30px_rgba(23,31,68,.35)] backdrop-blur">
-                    <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.18em] text-[#56608a]">
-                      <span>{c.k}</span>
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
-                    </div>
-                    <h3 className="display mt-10 text-[28px] !font-[500]">{c.t}</h3>
-                    <p className="mt-3 text-[15px] leading-relaxed text-[#56608a]">{c.d}</p>
-                    <div className="mt-8 border-t border-[#cfdedd] pt-5">
-                      <div className="num text-[34px] font-semibold">{c.stat}</div>
-                      <div className="text-[12.5px] text-[#56608a]">{c.sl}</div>
-                    </div>
-                  </Link>
-                </Tilt>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Scene 1: scroll-stacking console (MotionSites Nimbus pattern, live data) */}
+      <WaterConsole trades={trades} leaders={weekly ?? []} pod={pod} />
 
       {/* Scene 2 (deep): the pool + live feed */}
-      <section className="surface-dive relative overflow-hidden pt-[38vh]">
+      <section className="surface-dive relative overflow-hidden pt-36">
         <div className="caustics pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(180deg,transparent_0%,transparent_14%,#000_30%)]" aria-hidden />
         <div className="relative mx-auto max-w-[1240px] px-5">
           <Reveal>

@@ -122,19 +122,13 @@ body::after {
 .surface-dive {
   background: linear-gradient(
     180deg,
-    #eaf6f5 0%,
-    #e3f2f2 3%,
-    #cfe7e9 6%,
-    #aed3da 9%,
-    #84b7c4 12%,
-    #5a96a9 15%,
-    #3c7690 18%,
-    #2b5a7a 21%,
-    #22426a 24.5%,
-    #1c3159 28%,
-    #18244b 32%,
-    #141c40 38%,
-    #0f1533 50%,
+    #070b1d 0%,
+    #0b1430 8%,
+    #10213f 16%,
+    #133049 24%,
+    #12283f 32%,
+    #0f1a36 42%,
+    #0d1430 55%,
     #0a0f26 70%,
     #0a0f26 100%
   );
@@ -150,3 +144,10 @@ body::after {
 
 /* Never flash the nav over the homepage intro before JS decides */
 body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: translateY(-100%); }
+
+/* Plex pairing for the "Read the water" console section (from MotionSites Nimbus) */
+.plex { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; letter-spacing: .0175rem; }
+.plex-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; letter-spacing: 0; }
+
+@keyframes caret { 50% { opacity: 0; } }
+.caret::after { content: "▍"; margin-left: 2px; color: var(--color-aqua); animation: caret 1s steps(1) infinite; }
