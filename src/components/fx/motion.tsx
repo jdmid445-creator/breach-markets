@@ -15,7 +15,7 @@ export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast 
   return (
     <Tag ref={ref} className={className} aria-label={text}>
       {words.map((w, i) => (
-        <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+        <span key={i} aria-hidden className={`inline-block overflow-hidden align-bottom ${hiLast && i === words.length - 1 && words.length > 1 ? "-mb-[0.2em] pb-[0.28em] pr-[0.1em]" : "pb-[0.08em]"}`}>
           <motion.span
             className={`inline-block ${hiLast && i === words.length - 1 && words.length > 1 ? "hi-word" : ""}`}
             initial={reduce ? false : { y: "105%", rotate: 4 }}

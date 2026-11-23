@@ -3,7 +3,6 @@ import { bigTrades, leaderboard } from "@/lib/pm";
 import { usd, cents, pmMarket } from "@/lib/format";
 import { ScrollIntro } from "@/components/ScrollIntro";
 import { HomeLive } from "@/components/desk/Whales";
-import { HeroTail3D } from "@/components/fx/three";
 import { LeaderHub } from "@/components/fx/LeaderHub";
 import { Reveal, SplitTitle } from "@/components/fx/motion";
 import { BigTitle, VelocityTape } from "@/components/fx/scroll";
@@ -49,7 +48,7 @@ export default async function Home() {
           <SplitTitle as="h2" text="Top traders today" hiLast className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
         </div>
         <div className="mt-6">
-          <LeaderHub initial={today ?? []} titled={false} aside={<HeroTail3D className="h-[260px] w-[300px]" />} />
+          <LeaderHub initial={today ?? []} titled={false} />
         </div>
       </div>
 

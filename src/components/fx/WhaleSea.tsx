@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Text, Billboard } from "@react-three/drei";
@@ -192,47 +192,32 @@ function Tail({
  * Fit the whole sea to the panel, then dolly in as the panel scrolls up the
  * screen: the sea starts far and small and swells to fill the frame.
  */
+/**
+ * Frames the sea once and leaves the distance alone: no zooming with scroll.
+ * A resize only refits the distance and keeps whatever angle the user turned to.
+ */
 function Rig() {
-  const { camera, size, controls, gl } = useThree();
-  const fit = useRef(14);
+  const { camera, size, controls } = useThree();
   const target = useMemo(() => new THREE.Vector3(0, 0.4, 0), []);
+  const placed = useRef(false);
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const aspect = size.width / size.height;
     const v = THREE.MathUtils.degToRad(cam.fov / 2);
     const h = Math.atan(Math.tan(v) * aspect);
     // phones crop the outer ring a little so the whales stay big enough to read
-    fit.current = Math.max((aspect < 1 ? 8.2 : 10.6) / Math.tan(h), 5.4 / Math.tan(v), aspect < 1 ? 8 : 10);
-    const el = aspect < 1.35 ? 0.92 : 0.62;
-    cam.position.set(0, Math.sin(el) * fit.current * 1.5, Math.cos(el) * fit.current * 1.5);
+    const fit = Math.max((aspect < 1 ? 8.2 : 10.6) / Math.tan(h), 5.4 / Math.tan(v), aspect < 1 ? 8 : 10);
+    if (!placed.current) {
+      const el = aspect < 1.35 ? 0.92 : 0.62;
+      cam.position.set(0, Math.sin(el) * fit, Math.cos(el) * fit).add(target);
+      placed.current = true;
+    } else {
+      const dir = cam.position.clone().sub(target).setLength(fit);
+      cam.position.copy(target).add(dir);
+    }
     cam.lookAt(target);
     (controls as unknown as { update?: () => void } | null)?.update?.();
   }, [camera, size, controls, target]);
-  // scroll progress is measured on scroll, never inside the frame loop (reading layout every frame stutters on phones)
-  const prog = useRef(0);
-  useEffect(() => {
-    const el = gl.domElement;
-    const read = () => {
-      const r = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      prog.current = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.95)));
-    };
-    read();
-    window.addEventListener("scroll", read, { passive: true });
-    window.addEventListener("resize", read);
-    return () => {
-      window.removeEventListener("scroll", read);
-      window.removeEventListener("resize", read);
-    };
-  }, [gl]);
-  const dir = useMemo(() => new THREE.Vector3(), []);
-  useFrame((_, dt) => {
-    const want = fit.current * (1.55 - 0.55 * prog.current);
-    dir.copy(camera.position).sub(target);
-    const cur = dir.length();
-    if (Math.abs(want - cur) < 0.001) return;
-    camera.position.copy(target).add(dir.setLength(cur + (want - cur) * Math.min(1, dt * 4)));
-  });
   return null;
 }
 
@@ -438,7 +423,15 @@ function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[
  */
 export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trade[]; fresh?: Set<string>; height?: number }) {
   const router = useRouter();
-  const [hover, setHover] = useState<string | null>(null);
+  const [hover, setHoverNow] = useState<string | null>(null);
+  // Sliding across overlapping tails fires out/over in quick pairs; clearing
+  // the hover a beat late stops the card and auto-rotate from flickering.
+  const clear = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const setHover = useCallback((id: string | null) => {
+    if (clear.current) clearTimeout(clear.current);
+    if (id === null) clear.current = setTimeout(() => setHoverNow(null), 140);
+    else setHoverNow(id);
+  }, []);
   const [touch, setTouch] = useState(false);
   const [reduce, setReduce] = useState(false);
   const [now, setNow] = useState(() => Date.now() / 1000);

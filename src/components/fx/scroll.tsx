@@ -44,14 +44,14 @@ export function BigTitle({ text, hi = [], className = "", as = "h2" }: { text: s
   );
 }
 
-/** Starts a little smaller and lower; grows into place as soon as it's on screen. */
-export function ScrollZoom({ children, className = "", from = 0.9 }: { children: React.ReactNode; className?: string; from?: number }) {
+/** Fades up into place as soon as it's on screen (no scaling: canvases inside must not change size). */
+export function ScrollZoom({ children, className = "" }: { children: React.ReactNode; className?: string; from?: number }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       className={`overflow-hidden rounded-[18px] ${className}`}
-      initial={reduce ? false : { scale: from, opacity: 0, y: 40 }}
-      whileInView={{ scale: 1, opacity: 1, y: 0 }}
+      initial={reduce ? false : { opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
     >
