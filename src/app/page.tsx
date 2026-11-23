@@ -9,6 +9,7 @@ import { ScrollIntro } from "@/components/ScrollIntro";
 import { Reveal, Magnetic } from "@/components/fx";
 import { TextReveal } from "@/components/unlumen/text-reveal";
 import { WaterConsole } from "@/components/WaterConsole";
+import { Particles } from "@/components/Particles";
 import { podConsensus } from "@/lib/smart";
 
 export const revalidate = 30;
@@ -44,6 +45,7 @@ export default async function Home() {
       {/* Scene 2 (deep): the pool + live feed */}
       <section className="surface-dive relative overflow-hidden pt-36">
         <div className="caustics pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(180deg,transparent_0%,transparent_14%,#000_30%)]" aria-hidden />
+        <Particles density={45} />
         <div className="relative mx-auto max-w-[1240px] px-5">
           <Reveal>
             <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">The pool</p>

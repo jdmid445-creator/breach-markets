@@ -151,3 +151,9 @@ body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: trans
 
 @keyframes caret { 50% { opacity: 0; } }
 .caret::after { content: "▍"; margin-left: 2px; color: var(--color-aqua); animation: caret 1s steps(1) infinite; }
+
+/* Split-flap */
+.flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,.45); }
+@keyframes flap { 0% { transform: rotateX(0); } 50% { transform: rotateX(-80deg); } 100% { transform: rotateX(0); } }
+.flap-on { animation: flap .12s linear infinite; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) { .flap-on { animation: none; } }

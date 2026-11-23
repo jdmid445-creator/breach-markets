@@ -1,5 +1,6 @@
 import { INTRO } from "@/lib/media";
 import { TextReveal } from "./unlumen/text-reveal";
+import { Particles } from "./Particles";
 
 /**
  * Cinematic page header shared by every inner page: the underwater clip
@@ -34,6 +35,7 @@ export function PageHero({
       <div className="caustics pointer-events-none absolute inset-0 opacity-70" aria-hidden />
       <div className="contours drift pointer-events-none absolute -inset-[8%] opacity-60" aria-hidden />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,15,38,.55)_0%,rgba(10,15,38,.35)_45%,#0a0f26_100%)]" aria-hidden />
+      <Particles density={55} />
       <div className="relative mx-auto max-w-[1240px] px-5">
         <p className="flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">
           <span className="h-px w-8 bg-aqua/60" /> {kicker}

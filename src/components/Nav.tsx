@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 const LINKS = [
-  { href: "/live", label: "Live whales", live: true },
+  { href: "/live", label: "Whale alerts", live: true },
   { href: "/leaderboard", label: "Leaderboards" },
   { href: "/smart-money", label: "Smart money" },
 ];

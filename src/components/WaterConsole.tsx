@@ -19,11 +19,11 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
   const CARDS = [
     {
       key: "live",
-      tab: "Live whales",
+      tab: "Whale alerts",
       title: "Every $10K bet, the second it lands",
       body: "Breach watches the whole order flow and surfaces only the money that matters, tiered from Whale to Blue whale.",
       href: "/live",
-      cta: "Open the live feed",
+      cta: "Open whale alerts",
       visual: <LiveWindow trades={trades} on={active === 0} />,
     },
     {
@@ -214,6 +214,7 @@ function LiveWindow({ trades, on }: { trades: Trade[]; on: boolean }) {
           <span className={t.side === "BUY" ? "text-aqua" : "text-down"}>{t.side === "BUY" ? "▲" : "▼"}</span>
           <span className={t.usd >= 250_000 ? "text-pink" : ""}>{usd(t.usd)}</span>
           <span className="truncate">
+            {t.rank ? <b className="text-aqua">#{t.rank} {t.name} </b> : null}
             {t.outcome} @{cents(t.price)} · {t.title}
           </span>
         </div>

@@ -3,19 +3,21 @@ import { WhaleFeed } from "@/components/WhaleFeed";
 import { PageHero } from "@/components/PageHero";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Live whales — Breach" };
+export const metadata = { title: "Whale alerts — Breach" };
 
 export default async function LivePage() {
   const initial = (await bigTrades(10_000, 100, 5)) ?? [];
   return (
     <>
       <PageHero
-        kicker="Live feed"
-        title="Whales surfacing"
+        kicker="Whale alerts"
+        title="Big money, named and ranked"
         sub={
           <>
-            Every Polymarket bet over $10K, the moment it lands. Bets over $250K get the{" "}
-            <span className="rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tier-blue">Blue whale</span> tag.
+            Every bet over your threshold, the second it lands. Traders on the profit leaderboards show up{" "}
+            <b className="text-bone">bold with their rank</b>, and the top 10 glow{" "}
+            <span className="rounded bg-pink px-1.5 py-0.5 text-[11px] font-bold text-ink">#pink</span>. Turn on alerts to get a
+            browser notification when a ranked whale moves.
           </>
         }
         compact

@@ -17,6 +17,7 @@ const addr = (i: number) => "0x" + (i * 2654435761 >>> 0).toString(16).padStart(
 export function mock(path: string, params: Record<string, unknown>) {
   const now = Math.floor(Date.now() / 1000);
   if (path === "/leaderboard") {
+    if (params.limit === 1000) return { data: Array.from({ length: 8 }, (_, i) => ({ rank: (i * 7) % 40 + 1, user_id: addr(i + 1), pnl: 1, volume: 1, user_name: names[i] })) };
     if (params.user) return { data: { user_id: params.user, pnl: 182340, volume: 2.4e6, user_name: "Theo4", profile_image: "", x_username: "theo", verified: true, rank_pnl: 12, rank_volume: 40 } };
     return { data: Array.from({ length: Number(params.limit ?? 25) }, (_, i) => ({ rank: i + 1, user_id: addr(i + 1), pnl: Math.round(900000 / (i + 1) - i * 300), volume: Math.round(5e6 / (i + 1)), user_name: names[i % names.length], profile_image: "", x_username: i % 3 ? "" : names[i % names.length].toLowerCase(), verified: i % 4 === 0 })) };
   }

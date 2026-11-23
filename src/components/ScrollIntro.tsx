@@ -3,6 +3,8 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring, useTransform, useMotionValueEvent, useReducedMotion } from "motion/react";
 import { INTRO } from "@/lib/media";
+import { SplitFlap } from "./SplitFlap";
+import { Particles } from "./Particles";
 
 /**
  * Cinematic, scroll-driven intro.
@@ -54,6 +56,10 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
   const tail = useTransform(p, [0.8, 0.9], [0, 1]);
   const tailY = useTransform(p, [0.8, 0.92], [30, 0]);
   const hint = useTransform(p, [0, 0.04], [1, 0]);
+  const [statsOn, setStatsOn] = useState(false);
+  useMotionValueEvent(tail, "change", (v) => {
+    if (v > 0.6 && !statsOn) setStatsOn(true);
+  });
 
   return (
     <section id="intro" ref={wrap} className="relative" style={{ height: reduce ? "100vh" : "460vh" }} aria-label="Breach intro">
@@ -82,6 +88,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: reduce ? 1 : breachOpacity }}
         />
+        <Particles density={60} className="opacity-70" />
         {/* grade + vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,15,38,.85)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-ink to-transparent" />
@@ -116,7 +123,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link href="/live" className="rounded-full bg-aqua px-7 py-3.5 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-0.5">
-                Watch whales live
+                Open whale alerts
               </Link>
               <Link href="/leaderboard" className="rounded-full border border-bone/25 bg-ink/40 px-7 py-3.5 text-[15px] font-semibold text-bone backdrop-blur hover:border-bone/60">
                 Leaderboards
@@ -126,7 +133,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
               {stats.map((s) => (
                 <div key={s.label}>
                   <dt className="text-[11px] uppercase tracking-[0.16em] text-bone/60">{s.label}</dt>
-                  <dd className="num mt-1.5 text-[clamp(18px,2.4vw,26px)] font-semibold text-bone">{s.value}</dd>
+                  <dd className="num mt-1.5 text-[clamp(18px,2.4vw,26px)] font-semibold text-bone">{statsOn ? <SplitFlap value={s.value} /> : s.value}</dd>
                 </div>
               ))}
             </dl>

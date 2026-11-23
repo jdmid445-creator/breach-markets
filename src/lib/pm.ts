@@ -137,6 +137,9 @@ export type Trade = {
   icon: string;
   tx: string;
   bucket: Bucket;
+  /** Best leaderboard rank (all-time or 30-day profit), null if unranked. */
+  rank: number | null;
+  rankWindow: "all" | "month" | null;
 };
 
 function toTrade(r: Raw): Trade {
@@ -165,7 +168,40 @@ function toTrade(r: Raw): Trade {
     icon: str(pick(r, "icon")),
     tx,
     bucket: classify(`${eventSlug} ${slug}`, title),
+    rank: null,
+    rankWindow: null,
   };
+}
+
+/* ---------------- Rank lookup ---------------- */
+
+type RankEntry = { rank: number; window: "all" | "month" };
+
+/** Wallet -> best rank across the all-time and 30-day profit boards (top 1000 each). */
+export async function rankMap(): Promise<Map<string, RankEntry>> {
+  const [all, month] = await Promise.all([
+    get<{ data?: Raw[] }>("/leaderboard", { time_period: "all", sort_by: "PNL", limit: 1000 }, 900),
+    get<{ data?: Raw[] }>("/leaderboard", { time_period: "month", sort_by: "PNL", limit: 1000 }, 600),
+  ]);
+  const m = new Map<string, RankEntry>();
+  const add = (rows: Raw[] | undefined, window: "all" | "month") =>
+    (rows ?? []).forEach((r, i) => {
+      const a = str(pick(r, "user_id", "proxy_wallet", "proxyWallet")).toLowerCase();
+      if (!a) return;
+      const rank = num(pick(r, "rank")) || i + 1;
+      const cur = m.get(a);
+      if (!cur || rank < cur.rank) m.set(a, { rank, window });
+    });
+  add(all?.data, "all");
+  add(month?.data, "month");
+  return m;
+}
+
+export function withRanks(trades: Trade[], ranks: Map<string, RankEntry>): Trade[] {
+  return trades.map((t) => {
+    const r = ranks.get(t.wallet.toLowerCase());
+    return r ? { ...t, rank: r.rank, rankWindow: r.window } : t;
+  });
 }
 
 /** Global trade feed filtered by minimum cash size (USDC). */
@@ -177,7 +213,9 @@ export async function bigTrades(minUsd: number, limit = 100, revalidate = 5): Pr
     limit,
   }, revalidate);
   if (!json || !Array.isArray(json.data)) return null;
-  return json.data.map(toTrade).sort((a, b) => b.ts - a.ts);
+  const trades = json.data.map(toTrade).sort((a, b) => b.ts - a.ts);
+  const ranks = await rankMap().catch(() => new Map<string, RankEntry>());
+  return withRanks(trades, ranks);
 }
 
 /** Walk the global feed backwards until `sinceTs`, capped at `maxPages`. */
