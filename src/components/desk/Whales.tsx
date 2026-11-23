@@ -9,7 +9,8 @@ import { bucketLabel, isSport } from "@/lib/sports";
 import { useWhales, useNow } from "@/lib/useWhales";
 import { Sea } from "@/components/fx/Sea";
 import { MarketIcon, RankChip, Empty, Panel, Side } from "./ui";
-import { SplitTitle, Reveal, Counter } from "@/components/fx/motion";
+import { Counter } from "@/components/fx/motion";
+import { ScrollZoom } from "@/components/fx/scroll";
 
 const MARKETS = [
   { id: "all", label: "All" },
@@ -32,38 +33,32 @@ export function HomeLive({ initial }: { initial: Trade[] }) {
 
   return (
     <section>
-      <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
-        <div>
-          <SplitTitle as="h2" text="Whales breaking the surface" className="title text-[clamp(36px,5vw,72px)] text-fg" />
-          <Reveal delay={0.3}>
-            <p className="mt-4 max-w-[56ch] text-[16px] leading-relaxed text-mist">
-              Every Polymarket bet of $10K or more, live. Each tail is one bet; the taller it stands, the bigger the bet. Red tails are top-10 traders. Drag the sea to turn it, click a tail to see who placed it.
-            </p>
-          </Reveal>
+      <ScrollZoom className="relative border border-hair-2 bg-shoal/30">
+        <Sea trades={trades} fresh={fresh} height={780} />
+        <div className="pointer-events-none absolute left-5 right-5 top-5 flex flex-wrap items-start justify-between gap-4">
+          <p className="flex items-center gap-2 rounded-full border border-hair-2 bg-sea/70 px-3 py-1.5 text-[13px] text-mist backdrop-blur-md">
+            {status === "live" && <span className="live-dot" />}
+            Last 60 whale bets, newest in the middle
+          </p>
+          <dl className="grid grid-cols-3 gap-x-6 rounded-2xl border border-hair-2 bg-sea/70 px-5 py-3 backdrop-blur-md">
+            <Stat label="Bets, last hour" value={<Counter value={hour.length} format="int" />} />
+            <Stat label="Money moved" value={<Counter value={total} />} />
+            <Stat label="Ranked traders" value={<Counter value={hour.length ? (ranked / hour.length) * 100 : 0} format="pct" />} />
+          </dl>
         </div>
-        <dl className="grid grid-cols-3 gap-x-8 gap-y-1 sm:gap-x-12">
-          <Stat label="Whale bets, last hour" value={<Counter value={hour.length} format="int" />} />
-          <Stat label="Money moved" value={<Counter value={total} />} />
-          <Stat label="From ranked traders" value={<Counter value={hour.length ? (ranked / hour.length) * 100 : 0} format="pct" />} />
-        </dl>
-      </div>
+      </ScrollZoom>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-12">
-        <Reveal className="lg:col-span-8">
-          <div className="overflow-hidden rounded-xl border border-hair-2 bg-shoal/40">
-            <div className="flex items-center gap-2.5 border-b border-hair px-4 py-3">
-              {status === "live" && <span className="live-dot" />}
-              <span className="text-[14.5px] font-semibold text-fg">The sea</span>
-              <span className="text-[13px] text-faint max-sm:hidden">last 60 whale bets, newest in the middle</span>
-            </div>
-            <Sea trades={trades} fresh={fresh} height={600} />
-          </div>
-        </Reveal>
-        <Reveal className="lg:col-span-4" delay={0.12}>
-          <Panel title="Latest whales" href="/live" hrefLabel="All alerts" live={status === "live"} bodyClass="max-h-[600px] overflow-y-auto">
-            <WhaleList trades={trades.slice(0, 30)} fresh={fresh} now={now} />
-          </Panel>
-        </Reveal>
+      <div className="mt-16 flex items-end justify-between gap-6">
+        <h3 className="title text-[clamp(26px,3vw,40px)] text-fg">Latest whales</h3>
+        <Link href="/live" className="press group flex items-center gap-1.5 text-[14px] text-mist hover:text-fg">
+          All alerts <ArrowUpRight size={15} className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+      <div className="mt-5 grid gap-x-10 border-t border-hair-2 md:grid-cols-2">
+        <WhaleList trades={trades.slice(0, 6)} fresh={fresh} now={now} />
+        <div className="max-md:hidden">
+          <WhaleList trades={trades.slice(6, 12)} fresh={fresh} now={now} />
+        </div>
       </div>
     </section>
   );
@@ -73,7 +68,7 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col-reverse">
       <dt className="mt-1 text-[12.5px] text-faint">{label}</dt>
-      <dd className="text-[30px] font-semibold leading-none text-fg">{value}</dd>
+      <dd className="text-[24px] font-semibold leading-none text-fg">{value}</dd>
     </div>
   );
 }
@@ -264,8 +259,8 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
       <thead>
         <tr className="border-b border-hair text-[12.5px] text-faint">
           <th className="w-[64px] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">When</th>
-          <th className="px-3 py-2.5 sm:px-4 font-normal">Trader and bet</th>
-          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal max-xl:hidden">Market type</th>
+          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader and bet</th>
+          
           <th className="px-3 py-2.5 sm:px-4 text-right font-normal">Size</th>
         </tr>
       </thead>
@@ -280,7 +275,7 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
               initial={fresh?.has(t.id) ? { opacity: 0, y: -16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 380, damping: 32 }}
-              className={`spot border-b border-hair last:border-0 ${fresh?.has(t.id) ? "row-wash" : ""}`}
+              className={`spot-row border-b border-hair last:border-0 ${fresh?.has(t.id) ? "row-wash" : ""}`}
             >
               <td className="fig px-3 py-3 sm:px-4 align-top text-[13px] text-faint max-md:hidden" suppressHydrationWarning>
                 {now ? ago(t.ts, now) : ""}
@@ -306,12 +301,13 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
                       className="group mt-1 flex items-center gap-1 text-[13px] text-mist hover:text-fg"
                     >
                       <span className="truncate">{t.title || "Unknown market"}</span>
+                      <span className="shrink-0 text-faint">· {bucketLabel(t.bucket)}</span>
                       <ArrowUpRight size={13} className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
                     </a>
                   </div>
                 </div>
               </td>
-              <td className="whitespace-nowrap px-3 py-3 sm:px-4 align-top text-[13px] text-mist max-xl:hidden">{bucketLabel(t.bucket)}</td>
+              
               <td className="px-3 py-3 sm:px-4 text-right align-top">
                 <div className={`fig text-[16px] font-semibold ${ranked ? "text-fg" : "text-mist"}`}>{usd(t.usd)}</div>
                 {t.usd >= 50_000 && <div className="mt-0.5 whitespace-nowrap text-[12px] text-faint">{tr.label}</div>}

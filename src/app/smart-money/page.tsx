@@ -27,10 +27,10 @@ export default async function SmartMoneyPage() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-hair text-[12.5px] text-faint">
-                  <th className="px-3 py-2.5 font-normal sm:px-4">Market and side</th>
+                  <th className="whitespace-nowrap px-3 py-2.5 font-normal sm:px-4">Market and side</th>
                   <th className="whitespace-nowrap px-3 py-2.5 font-normal max-md:hidden sm:px-4">Top 30 traders holding it</th>
                   <th className="whitespace-nowrap px-3 py-2.5 text-right font-normal max-sm:hidden sm:px-4">Price now</th>
-                  <th className="px-3 py-2.5 text-right font-normal sm:px-4">Combined</th>
+                  <th className="whitespace-nowrap px-3 py-2.5 text-right font-normal sm:px-4">Combined</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,7 +49,7 @@ export default async function SmartMoneyPage() {
 function Row({ a, lead, i }: { a: Consensus; lead: boolean; i: number }) {
   const faces = a.whales.filter(({ t }) => t.image).slice(0, 6);
   return (
-    <RevealRow i={i} className="spot border-b border-hair last:border-0">
+    <RevealRow i={i} className="spot-row border-b border-hair last:border-0">
       <td className={`w-full max-w-0 px-3 sm:px-4 ${lead ? "py-5" : "py-3"}`}>
         <a href={pmMarket(a.eventSlug, a.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
           <MarketIcon src={a.icon} label={a.title} size={lead ? 48 : 34} />

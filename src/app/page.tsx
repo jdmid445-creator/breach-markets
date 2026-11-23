@@ -4,7 +4,8 @@ import { usd, cents, pmMarket } from "@/lib/format";
 import { ScrollIntro } from "@/components/ScrollIntro";
 import { HomeLive } from "@/components/desk/Whales";
 import { LeaderHub } from "@/components/fx/LeaderHub";
-import { SplitTitle, Reveal } from "@/components/fx/motion";
+import { Reveal } from "@/components/fx/motion";
+import { BigTitle, VelocityTape } from "@/components/fx/scroll";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
 import { Avatar } from "@/components/Avatar";
 import { podConsensus } from "@/lib/smart";
@@ -43,14 +44,34 @@ export default async function Home() {
       <div aria-hidden className="h-24 bg-[linear-gradient(180deg,#0a0f26,#03203d)]" />
 
       <div className="mx-auto max-w-[1360px] px-5 pt-28 md:px-8">
-        <LeaderHub initial={today ?? []} />
+        <BigTitle text="Top traders today" hi={["today"]} className="text-[clamp(52px,9.5vw,156px)] text-fg" />
+        <div className="mt-6">
+          <LeaderHub initial={today ?? []} titled={false} />
+        </div>
+      </div>
 
-        <div className="mt-32">
+      <div className="mt-28">
+        <VelocityTape items={["$10K+ bets", "Live", "Ranked traders", "Every market"]} />
+      </div>
+
+      <div className="mx-auto max-w-[1600px] px-3 pt-20 md:px-6">
+        <div className="mx-auto max-w-[1360px] px-2 md:px-2">
+          <BigTitle text="Whales breaking the surface" hi={["surface"]} className="text-[clamp(48px,8.5vw,140px)] text-fg" />
+          <Reveal delay={0.2}>
+            <p className="mt-6 max-w-[60ch] text-[17px] leading-relaxed text-mist">
+              Every Polymarket bet of $10K or more, live. Each tail is one bet and the taller it stands, the bigger the bet. Red is a top-10 trader. Drag to turn the sea, click a tail to see who placed it.
+            </p>
+          </Reveal>
+        </div>
+        <div className="mt-12">
           <HomeLive initial={trades} />
         </div>
+      </div>
+
+      <div className="mx-auto max-w-[1360px] px-5 md:px-8">
 
         <div className="mt-32">
-          <SplitTitle as="h2" text="Where the money is" className="title text-[clamp(36px,5vw,72px)] text-fg" />
+          <BigTitle text="Follow the smart money" hi={["smart"]} className="text-[clamp(48px,8.5vw,140px)] text-fg" />
         </div>
         <div className="mt-10 grid gap-x-8 gap-y-12 lg:grid-cols-12">
           <Reveal className="lg:col-span-12">

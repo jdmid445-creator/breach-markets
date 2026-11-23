@@ -6,7 +6,7 @@ import { usd } from "@/lib/format";
 const EASE = [0.23, 1, 0.32, 1] as const;
 
 /** Headline that rises in word by word out of a blur, once, when it scrolls into view. */
-export function SplitTitle({ text, className = "", as = "h2", delay = 0 }: { text: string; className?: string; as?: "h1" | "h2" | "h3"; delay?: number }) {
+export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast = false }: { text: string; className?: string; as?: "h1" | "h2" | "h3"; delay?: number; hiLast?: boolean }) {
   const ref = useRef<HTMLHeadingElement>(null);
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
   const reduce = useReducedMotion();
@@ -17,7 +17,7 @@ export function SplitTitle({ text, className = "", as = "h2", delay = 0 }: { tex
       {words.map((w, i) => (
         <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.08em] align-bottom">
           <motion.span
-            className="inline-block"
+            className={`inline-block ${hiLast && i === words.length - 1 && words.length > 1 ? "text-stone-hi" : ""}`}
             initial={reduce ? false : { y: "105%", rotate: 4, filter: "blur(6px)" }}
             animate={inView ? { y: "0%", rotate: 0, filter: "blur(0px)" } : undefined}
             transition={{ duration: 0.8, ease: EASE, delay: delay + i * 0.07 }}

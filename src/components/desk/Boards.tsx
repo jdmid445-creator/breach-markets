@@ -44,9 +44,9 @@ export function TraderTable({ rows, sort, sortHrefs, skip = 0 }: { rows: Trader[
     <table className="w-full border-collapse text-left">
       <thead>
         <tr className="border-b border-hair text-[12.5px] text-faint">
-          <th className="w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
-          <th className="px-3 py-2.5 sm:px-4 font-normal">Trader</th>
-          <th className="w-[26%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden" aria-hidden />
+          <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
+          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader</th>
+          <th className="whitespace-nowrap w-[26%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden" aria-hidden />
           <SortTh active={sort === "PNL"} href={sortHrefs.PNL}>
             Profit
           </SortTh>
@@ -68,7 +68,7 @@ export function TraderTable({ rows, sort, sortHrefs, skip = 0 }: { rows: Trader[
               whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true, margin: "0px 0px -5% 0px" }}
               transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: Math.min(j, 12) * 0.035 }}
-              className="spot border-b border-hair last:border-0"
+              className="spot-row border-b border-hair last:border-0"
             >
               <td className="px-3 py-3 sm:px-4">
                 <span className={`fig ${podium ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{rank}</span>
@@ -125,15 +125,15 @@ export function FlowTable({ rows, offset = 0 }: { rows: FlowRow[]; offset?: numb
     <table className="w-full border-collapse text-left">
       <thead>
         <tr className="border-b border-hair text-[12.5px] text-faint">
-          <th className="w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
-          <th className="px-3 py-2.5 sm:px-4 font-normal">Trader and biggest bet</th>
-          <th className="px-3 py-2.5 sm:px-4 text-right font-normal">Money moved</th>
-          <th className="px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">Bets</th>
+          <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
+          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader and biggest bet</th>
+          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Money moved</th>
+          <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">Bets</th>
         </tr>
       </thead>
       <tbody>
         {rows.map((r, i) => (
-          <tr key={r.address} className="spot border-b border-hair last:border-0">
+          <tr key={r.address} className="spot-row border-b border-hair last:border-0">
             <td className={`fig px-3 py-3 sm:px-4 ${i + offset < 3 ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{i + 1 + offset}</td>
             <td className="w-full max-w-0 px-3 py-3 sm:px-4">
               <Link href={`/trader/${r.address}`} className="group flex min-w-0 items-center gap-3">

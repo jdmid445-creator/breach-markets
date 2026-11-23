@@ -139,3 +139,10 @@ body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: trans
 .tape { animation: tape 70s linear infinite; }
 .tape:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .tape, .ping { animation: none; } }
+
+/* Display voice: heavy, wide, uppercase, for the big section headlines only */
+.mega { font-family: var(--font-display); font-stretch: 125%; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; line-height: 0.88; }
+.mega-outline { color: transparent; -webkit-text-stroke: 2px var(--color-stone-hi); }
+/* Table rows can't take a pseudo-element (it becomes a stray cell), so they light with a background */
+tr.spot-row { transition: background-color 160ms var(--ease-out); }
+tr.spot-row:hover { background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgba(141,187,224,.13), transparent 70%), color-mix(in oklab, var(--color-reef) 35%, transparent); }

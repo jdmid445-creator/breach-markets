@@ -58,7 +58,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
           <Avatar src={image} seed={address} name={name} size={76} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <SplitTitle as="h1" text={name} className="title truncate text-[clamp(40px,6vw,80px)] text-fg" />
+              <SplitTitle as="h1" text={name} className="mega truncate text-[clamp(40px,6.5vw,104px)] text-fg" />
               {prof?.verified && <Verified />}
             </div>
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px] text-mist">
@@ -99,9 +99,9 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-hair text-[12.5px] text-faint">
-                    <th className="px-4 py-2 font-normal">Window</th>
-                    <th className="px-4 py-2 text-right font-normal">Profit</th>
-                    <th className="px-4 py-2 text-right font-normal">Rank</th>
+                    <th className="whitespace-nowrap px-4 py-2 font-normal">Window</th>
+                    <th className="whitespace-nowrap px-4 py-2 text-right font-normal">Profit</th>
+                    <th className="whitespace-nowrap px-4 py-2 text-right font-normal">Rank</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -179,10 +179,10 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-hair text-[12.5px] text-faint">
-                    <th className="px-3 py-2.5 sm:px-4 font-normal">Market and side</th>
-                    <th className="w-[28%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">Entry → now</th>
-                    <th className="px-3 py-2.5 sm:px-4 text-right font-normal">Value</th>
-                    <th className="px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">P&amp;L</th>
+                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Market and side</th>
+                    <th className="whitespace-nowrap w-[28%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">Entry → now</th>
+                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Value</th>
+                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">P&amp;L</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -228,9 +228,9 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-hair text-[12.5px] text-faint">
-                    <th className="w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal max-sm:hidden">When</th>
-                    <th className="px-3 py-2.5 sm:px-4 font-normal">Bet</th>
-                    <th className="px-3 py-2.5 sm:px-4 text-right font-normal">Size</th>
+                    <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal max-sm:hidden">When</th>
+                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Bet</th>
+                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Size</th>
                   </tr>
                 </thead>
                 <tbody>

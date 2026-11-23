@@ -16,7 +16,7 @@ export function CursorFx() {
       y = e.clientY;
       const t = e.target as HTMLElement | null;
       big = t?.closest("a, button, [role=tab], [role=switch], select, input, canvas") ? 1 : 0;
-      const spot = t?.closest<HTMLElement>(".spot");
+      const spot = t?.closest<HTMLElement>(".spot, .spot-row");
       if (spot) {
         const r = spot.getBoundingClientRect();
         spot.style.setProperty("--mx", `${e.clientX - r.left}px`);

@@ -88,7 +88,7 @@ void main(){
   float s = abs(fract(a / q) - 0.5) ;
   float spoke = 1.0 - smoothstep(0.0, 0.022, (0.5 - s) * q * d);
   float inner = smoothstep(${R_MIN.toFixed(1)} - 0.4, ${R_MIN.toFixed(1)}, d);
-  col += vec3(0.39, 0.61, 0.77) * (ringLine * 0.22 + spoke * 0.2 * inner) * edge;
+  col += vec3(0.39, 0.61, 0.77) * ringLine * 0.22 * edge * inner;
   // moonlight glints on wave crests
   float glint = smoothstep(0.1, 0.16, vH) * 0.35;
   col += vec3(0.55, 0.73, 0.88) * (glint + vRip * 0.7);
@@ -188,23 +188,104 @@ function Tail({
   );
 }
 
-/** Back the camera off until the whole sea fits the panel, whatever its shape. */
+/**
+ * Fit the whole sea to the panel, then dolly in as the panel scrolls up the
+ * screen: the sea starts far and small and swells to fill the frame.
+ */
 function Rig() {
-  const { camera, size, controls } = useThree();
+  const { camera, size, controls, gl } = useThree();
+  const fit = useRef(14);
+  const target = useMemo(() => new THREE.Vector3(0, 0.4, 0), []);
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const aspect = size.width / size.height;
     const v = THREE.MathUtils.degToRad(cam.fov / 2);
     const h = Math.atan(Math.tan(v) * aspect);
-    const fitW = 9.4 / Math.tan(h);
-    const fitH = 5.2 / Math.tan(v);
-    const dist = Math.max(fitW, fitH, 10);
-    const el = 0.6;
-    cam.position.set(0, Math.sin(el) * dist, Math.cos(el) * dist);
-    cam.lookAt(0, 0.4, 0);
+    fit.current = Math.max(10.6 / Math.tan(h), 5.4 / Math.tan(v), 10);
+    const el = aspect < 1.35 ? 0.92 : 0.62;
+    cam.position.set(0, Math.sin(el) * fit.current * 1.5, Math.cos(el) * fit.current * 1.5);
+    cam.lookAt(target);
     (controls as unknown as { update?: () => void } | null)?.update?.();
-  }, [camera, size, controls]);
+  }, [camera, size, controls, target]);
+  useFrame((_, dt) => {
+    const r = gl.domElement.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.95)));
+    const want = fit.current * (1.55 - 0.55 * p);
+    const dir = camera.position.clone().sub(target);
+    const cur = dir.length();
+    const next = cur + (want - cur) * Math.min(1, dt * 4);
+    camera.position.copy(target).add(dir.setLength(next));
+  });
   return null;
+}
+
+type Sector = { id: string; label: string; a0: number; a1: number };
+
+/**
+ * Spread the tails out: each market gets a slice of the sea sized by how many
+ * bets it has, newest bets sit nearest the middle, and a few rounds of
+ * relaxation push apart any tails that would touch.
+ */
+function layout(list: Trade[]): { placed: Placed[]; sectors: Sector[] } {
+  const counts = [0, 0, 0, 0];
+  list.forEach((t) => counts[sectorOf(t)]++);
+  const weights = counts.map((c) => 0.35 + Math.sqrt(c));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let acc = -Math.PI / 2 - (weights[0] / total) * Math.PI; // first slice faces the camera
+  const sectors: Sector[] = SECTORS.map((sct, i) => {
+    const w = (weights[i] / total) * Math.PI * 2;
+    const out = { ...sct, a0: acc, a1: acc + w };
+    acc += w;
+    return out;
+  });
+  if (!list.length) return { placed: [], sectors };
+  const max = Math.max(...list.map((t) => t.usd));
+  const placed: (Placed & { sec: number })[] = [];
+  for (let k = 0; k < 4; k++) {
+    const items = list.filter((t) => sectorOf(t) === k).sort((a, b) => b.ts - a.ts);
+    const { a0, a1 } = sectors[k];
+    const pad = Math.min(0.12, (a1 - a0) * 0.15);
+    items.forEach((t, j) => {
+      let h = 0;
+      for (const c of t.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      const r = R_MIN + (items.length > 1 ? j / (items.length - 1) : 0.3) * (R_MAX - R_MIN);
+      const f = (j * 0.618034 + (h % 97) / 970) % 1;
+      const ang = a0 + pad + f * (a1 - a0 - pad * 2);
+      placed.push({ t, x: Math.cos(ang) * r, z: Math.sin(ang) * r, s: 0.55 + 0.95 * Math.sqrt(t.usd / max), phase: (h % 628) / 100, sec: k });
+    });
+  }
+  // relax: no two tails closer than their combined half-widths
+  for (let it = 0; it < 90; it++) {
+    for (let i = 0; i < placed.length; i++)
+      for (let j = i + 1; j < placed.length; j++) {
+        const A = placed[i], B = placed[j];
+        const dx = B.x - A.x, dz = B.z - A.z;
+        const d = Math.hypot(dx, dz) || 0.001;
+        const min = (A.s + B.s) * 0.62;
+        if (d < min) {
+          const push = (min - d) / 2;
+          const ux = dx / d, uz = dz / d;
+          A.x -= ux * push; A.z -= uz * push;
+          B.x += ux * push; B.z += uz * push;
+        }
+      }
+    for (const P of placed) {
+      // keep each tail inside its market's slice and inside the sea
+      let r = Math.hypot(P.x, P.z);
+      let ang = Math.atan2(P.z, P.x);
+      const { a0, a1 } = sectors[P.sec];
+      while (ang < a0) ang += Math.PI * 2;
+      while (ang > a0 + Math.PI * 2) ang -= Math.PI * 2;
+      const inset = Math.min(0.5 / Math.max(r, 1), (a1 - a0) / 2 - 0.001);
+      if (ang > a1 - inset) ang = ang - (a1 - inset) < (a0 + Math.PI * 2 - ang) ? a1 - inset : a0 + inset;
+      if (ang < a0 + inset) ang = a0 + inset;
+      r = Math.min(R_MAX + 0.6, Math.max(R_MIN, r));
+      P.x = Math.cos(ang) * r;
+      P.z = Math.sin(ang) * r;
+    }
+  }
+  return { placed, sectors };
 }
 
 function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[]; fresh?: Set<string>; onPick: (t: Trade) => void; hover: string | null; setHover: (id: string | null) => void; now: number }) {
@@ -213,23 +294,7 @@ function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[
   const born = useRef(new Map<string, number>());
   const { clock } = useThree();
 
-  const placed = useMemo<Placed[]>(() => {
-    const list = trades.slice(0, 60);
-    if (!list.length) return [];
-    const newest = Math.max(...list.map((t) => t.ts));
-    const oldest = Math.min(...list.map((t) => t.ts));
-    const spanS = Math.max(300, newest - oldest);
-    const max = Math.max(...list.map((t) => t.usd));
-    return list.map((t) => {
-      let h = 0;
-      for (const c of t.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-      const sec = sectorOf(t);
-      const a0 = sec * (Math.PI / 2);
-      const ang = a0 + 0.16 + ((h % 1000) / 1000) * (Math.PI / 2 - 0.32);
-      const r = R_MIN + ((newest - t.ts) / spanS) * (R_MAX - R_MIN);
-      return { t, x: Math.cos(ang) * r, z: Math.sin(ang) * r, s: 0.6 + 1.35 * Math.sqrt(t.usd / max), phase: (h % 628) / 100 };
-    });
-  }, [trades]);
+  const { placed, sectors } = useMemo(() => layout(trades.slice(0, 60)), [trades]);
 
   // new bets: start their breach now and drop a ripple where they land
   useEffect(() => {
@@ -260,10 +325,10 @@ function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[
     }
   });
 
-  const labels = SECTORS.map((s, i) => {
-    const a = i * (Math.PI / 2) + Math.PI / 4;
-    const r = 9.55;
-    return { ...s, x: Math.cos(a) * r, z: Math.sin(a) * r, rot: -a + Math.PI / 2 };
+  const labels = sectors.map((sc) => {
+    const a = (sc.a0 + sc.a1) / 2;
+    const r = 9.75;
+    return { ...sc, x: Math.cos(a) * r, z: Math.sin(a) * r, rot: -a + Math.PI / 2 };
   });
 
   const hovered = placed.find((p) => p.t.id === hover);
@@ -287,21 +352,38 @@ function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[
           onClick={() => onPick(p.t)}
         />
       ))}
-      {/* the biggest bets carry their size, like soundings on a chart */}
+      {/* the biggest bets carry their size, printed on the tail and sized to fit it */}
       {[...placed]
         .sort((a, b) => b.t.usd - a.t.usd)
-        .slice(0, 8)
-        .map((p) => (
-          <Billboard key={`l-${p.t.id}`} position={[p.x, p.s * 0.95 + 0.25, p.z]}>
-            <Text font="/fonts/hanken-700i.woff" fontSize={0.34} color={p.t.rank !== null && p.t.rank <= 10 ? "#ff8a8c" : "#eef3f8"} anchorX="center" anchorY="bottom" outlineWidth={0.02} outlineColor="#03203d">
-              {usd(p.t.usd)}
-            </Text>
-          </Billboard>
-        ))}
-      {labels.map((l) => (
-        <Text key={l.id} font="/fonts/hanken-600.woff" position={[l.x, 0.05, l.z]} rotation={[-Math.PI / 2, 0, l.rot]} fontSize={0.42} color="#8dbbe0" anchorX="center" anchorY="middle" fillOpacity={0.85}>
-          {l.label}
-        </Text>
+        .slice(0, 14)
+        .map((p) => {
+          const label = usd(p.t.usd);
+          const fluke = (43 / 36) * p.s; // tail width in world units
+          const fs = Math.min(0.42, (fluke * 0.82) / (label.length * 0.56));
+          return (
+            <Billboard key={`l-${p.t.id}`} position={[p.x, p.s * 0.62, p.z]}>
+              <Text
+                font="/fonts/hanken-700i.woff"
+                position={[0, 0, Math.max(0.3, p.s * 0.35)]}
+                fontSize={fs}
+                color={p.t.rank !== null && p.t.rank <= 10 ? "#ffffff" : "#03203d"}
+                anchorX="center"
+                anchorY="middle"
+                outlineWidth={fs * 0.12}
+                outlineColor={p.t.rank !== null && p.t.rank <= 10 ? "#8f1418" : "#eef3f8"}
+                renderOrder={5}
+              >
+                {label}
+              </Text>
+            </Billboard>
+          );
+        })}
+      {/* market boundaries */}
+      {sectors.map((sc) => (
+        <mesh key={`b-${sc.id}`} position={[Math.cos(sc.a0) * ((R_MIN + 10) / 2), 0.03, Math.sin(sc.a0) * ((R_MIN + 10) / 2)]} rotation={[-Math.PI / 2, 0, -sc.a0]}>
+          <planeGeometry args={[10 - R_MIN + 0.6, 0.035]} />
+          <meshBasicMaterial color="#639cc5" transparent opacity={0.45} />
+        </mesh>
       ))}
       {hovered && (
         <Html position={[hovered.x, hovered.s * 1.05 + 0.4, hovered.z]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>

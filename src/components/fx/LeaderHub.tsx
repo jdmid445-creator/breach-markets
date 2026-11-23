@@ -21,7 +21,7 @@ const SPORT_TABS = [{ id: "all", label: "All sports" }, ...SPORTS.map((s) => ({ 
  * The first thing after the intro: pick a market (and a sport), pick profit or
  * volume, see the top 20 for the last 24 hours. Refreshes every minute.
  */
-export function LeaderHub({ initial }: { initial: Row[] }) {
+export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?: boolean }) {
   const reduce = useReducedMotion();
   const [cat, setCat] = useState<string>("overall");
   const [sport, setSport] = useState<string>("all");
@@ -77,7 +77,7 @@ export function LeaderHub({ initial }: { initial: Row[] }) {
     <section className="relative">
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
         <div>
-          <SplitTitle as="h2" text="Top traders today" className="title text-[clamp(40px,6vw,84px)] text-fg" />
+          {titled && <SplitTitle as="h2" text="Top traders today" className="title text-[clamp(40px,6vw,84px)] text-fg" />}
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
