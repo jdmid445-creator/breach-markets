@@ -72,8 +72,8 @@ export default async function Home() {
       </section>
 
       {/* Scene 2 (deep): the pool + live feed */}
-      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#eaf6f5_0%,#2a6f86_7%,#171f44_22%,#0a0f26_100%)] pt-40">
-        <div className="caustics pointer-events-none absolute inset-0 opacity-80" aria-hidden />
+      <section className="surface-dive relative overflow-hidden pt-[38vh]">
+        <div className="caustics pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(180deg,transparent_0%,transparent_14%,#000_30%)]" aria-hidden />
         <div className="relative mx-auto max-w-[1240px] px-5">
           <Reveal>
             <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">The pool</p>

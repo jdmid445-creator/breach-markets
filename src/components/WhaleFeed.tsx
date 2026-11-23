@@ -6,6 +6,7 @@ import { usd, cents, ago, tier, pmMarket } from "@/lib/format";
 import { bucketLabel, isSport } from "@/lib/sports";
 import { Avatar } from "./Avatar";
 import { BubblePool } from "./BubblePool";
+import { motion } from "motion/react";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -88,7 +89,7 @@ export function WhaleFeed({ initial, compact = false, limit = 60, pool = false }
           <Seg value={min} onChange={setMin} options={SIZES.map((s) => ({ v: s, l: `${usd(s)}+` }))} />
           <button
             onClick={() => setPaused((p) => !p)}
-            className="ml-auto rounded-full border hairline px-3.5 py-1.5 text-[13px] text-mute hover:text-bone"
+            className="ml-auto rounded-full border border-line bg-coal/70 px-4 py-2 text-[13px] text-mute backdrop-blur-md hover:border-aqua/50 hover:text-aqua"
           >
             {paused ? "Resume" : "Pause"}
           </button>
@@ -112,7 +113,7 @@ export function WhaleFeed({ initial, compact = false, limit = 60, pool = false }
         </div>
       )}
 
-      <ul className="divide-y divide-line overflow-hidden rounded-2xl border hairline bg-coal">
+      <ul className="glass divide-y divide-line overflow-hidden rounded-[28px]">
         {shown.length === 0 && (
           <li className="px-5 py-14 text-center text-mute">
             {status === "error" ? "Polymarket isn’t answering right now. Retrying…" : "No whales match these filters yet. They’ll surface here."}
@@ -137,7 +138,7 @@ function WhaleRow({ t, isNew, compact, now }: { t: Trade; isNew: boolean; compac
         </Link>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px]">
-            <Link href={`/trader/${t.wallet}`} className="max-w-[16ch] truncate font-semibold hover:text-royal-soft">
+            <Link href={`/trader/${t.wallet}`} className="max-w-[16ch] truncate font-semibold hover:text-aqua">
               {t.name}
             </Link>
             <span className={buy ? "text-up" : "text-down"}>{buy ? "bought" : "sold"}</span>
@@ -176,17 +177,23 @@ function Seg<T extends string | number>({
   onChange: (v: T) => void;
   options: { v: T; l: string }[];
 }) {
+  const id = options.map((o) => o.v).join("-");
   return (
-    <div className="flex rounded-full border hairline bg-coal p-0.5 text-[13px]">
+    <div className="flex rounded-full border border-line bg-coal/70 p-1 text-[13px] backdrop-blur-md">
       {options.map((o) => (
         <button
           key={String(o.v)}
           onClick={() => onChange(o.v)}
-          className={`rounded-full px-3 py-1.5 transition-colors ${
-            value === o.v ? "bg-aqua text-ink" : "text-mute hover:text-bone"
-          }`}
+          className={`relative rounded-full px-3.5 py-1.5 transition-colors ${value === o.v ? "text-ink" : "text-mute hover:text-bone"}`}
         >
-          {o.l}
+          {value === o.v && (
+            <motion.span
+              layoutId={`feedseg-${id}`}
+              className="absolute inset-0 rounded-full bg-aqua shadow-[0_0_24px_rgba(116,255,237,.35)]"
+              transition={{ type: "spring", stiffness: 420, damping: 34 }}
+            />
+          )}
+          <span className="relative font-medium">{o.l}</span>
         </button>
       ))}
     </div>

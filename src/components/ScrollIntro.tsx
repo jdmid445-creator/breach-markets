@@ -56,7 +56,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
   const hint = useTransform(p, [0, 0.04], [1, 0]);
 
   return (
-    <section ref={wrap} className="relative" style={{ height: reduce ? "100vh" : "460vh" }} aria-label="Breach intro">
+    <section id="intro" ref={wrap} className="relative" style={{ height: reduce ? "100vh" : "460vh" }} aria-label="Breach intro">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-ink">
         {/* clips */}
         <motion.video

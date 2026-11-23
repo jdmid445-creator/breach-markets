@@ -3,6 +3,8 @@ import { leaderboard, positions, type Position, type Trader } from "@/lib/pm";
 import { usd, cents, pmMarket } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
+import { PageHero } from "@/components/PageHero";
+import { Reveal, Tilt } from "@/components/fx";
 
 export const revalidate = 600;
 export const metadata = { title: "Smart money — Breach" };
@@ -42,54 +44,80 @@ export default async function SmartMoneyPage() {
     .sort((a, b) => b.whales.length - a.whales.length || b.value - a.value)
     .slice(0, 40);
 
-  return (
-    <div className="mx-auto max-w-[1100px] px-5 pt-12">
-      <p className="text-[13px] font-medium uppercase tracking-[0.18em] text-royal-soft">Smart money</p>
-      <h1 className="display mt-3 text-[clamp(48px,8vw,92px)]">
-        Where the <span className="text-royal">pod</span> is swimming
-      </h1>
-      <p className="mt-4 max-w-[620px] text-[16px] leading-relaxed text-mute">
-        We pull the open books of the 30 most profitable traders this month and show the bets two or more of them share.
-        When the sharpest wallets stack the same side, you see it here first. Updates every 10 minutes.
-      </p>
+  const maxWhales = Math.max(...rows.map((r) => r.whales.length), 2);
 
-      <div className="mt-10 grid gap-3">
+  return (
+    <>
+      <PageHero
+        kicker="Smart money"
+        title="Where the pod is swimming"
+        sub="We read the open books of the 30 most profitable traders this month and surface the bets two or more of them share. Updates every 10 minutes."
+        compact
+      />
+      <div className="mx-auto grid max-w-[1240px] gap-4 px-5 md:grid-cols-2">
         {rows.length === 0 && (
-          <div className="rounded-2xl border hairline bg-coal px-5 py-14 text-center text-mute">
+          <div className="glass rounded-[28px] px-5 py-14 text-center text-mute md:col-span-2">
             No shared positions right now, or Polymarket didn’t answer. Check back shortly.
           </div>
         )}
         {rows.map((a, i) => (
-          <article key={a.key} className="grid items-center gap-4 rounded-2xl border hairline bg-coal px-5 py-4 sm:grid-cols-[44px_1fr_auto]">
-            <span className={`num text-[22px] font-bold ${i < 3 ? "text-tang" : "text-mute"}`}>{i + 1}</span>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2 text-[12px] text-mute">
-                <span className="uppercase tracking-[0.12em]">{bucketLabel(a.bucket)}</span>
-              </div>
-              <a href={pmMarket(a.eventSlug, a.slug)} target="_blank" rel="noreferrer" className="mt-1 block text-[16px] font-semibold leading-snug hover:text-royal-soft">
-                {a.title}
-              </a>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  {a.whales.slice(0, 7).map(({ t }) => (
-                    <Link key={t.address} href={`/trader/${t.address}`} title={t.name} className="rounded-full ring-2 ring-coal">
-                      <Avatar src={t.image} seed={t.address} size={28} />
-                    </Link>
-                  ))}
+          <Reveal key={a.key} delay={(i % 6) * 70} className={i === 0 ? "md:col-span-2" : ""}>
+            <Tilt className="group h-full rounded-[28px]">
+              <article
+                className={`glass relative h-full overflow-hidden rounded-[28px] px-6 py-6 transition-colors group-hover:border-aqua/40 ${
+                  i === 0 ? "bg-[radial-gradient(circle_at_85%_0%,rgba(116,255,237,.16),rgba(16,23,58,.85)_55%)] md:px-9 md:py-9" : ""
+                }`}
+              >
+                <div className="flex items-center justify-between text-[11.5px] uppercase tracking-[0.16em] text-mute">
+                  <span>
+                    <span className="num text-aqua">{String(i + 1).padStart(2, "0")}</span> · {bucketLabel(a.bucket)}
+                  </span>
+                  <span className="num normal-case tracking-normal">now {cents(a.price)}</span>
                 </div>
-                <span className="text-[13px] text-mute">
-                  <span className="font-semibold text-bone">{a.whales.length} top traders</span> hold{" "}
-                  <span className="rounded bg-aqua px-1.5 py-0.5 text-[12px] font-semibold text-ink">{a.outcome}</span>
-                </span>
-              </div>
-            </div>
-            <div className="text-right max-sm:text-left">
-              <div className="num text-[22px] font-semibold">{usd(a.value)}</div>
-              <div className="num text-[12.5px] text-mute">combined · now {cents(a.price)}</div>
-            </div>
-          </article>
+                <a
+                  href={pmMarket(a.eventSlug, a.slug)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`mt-4 block font-semibold leading-snug hover:text-aqua ${i === 0 ? "display text-[clamp(28px,3.4vw,44px)] !font-[500]" : "text-[18px]"}`}
+                >
+                  {a.title}
+                </a>
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  <div className="flex -space-x-2.5">
+                    {a.whales.slice(0, 8).map(({ t }, j) => (
+                      <Link
+                        key={t.address}
+                        href={`/trader/${t.address}`}
+                        title={t.name}
+                        className="row-in rounded-full ring-2 ring-coal transition-transform hover:z-10 hover:-translate-y-1"
+                        style={{ animationDelay: `${300 + j * 60}ms` }}
+                      >
+                        <Avatar src={t.image} seed={t.address} size={32} />
+                      </Link>
+                    ))}
+                  </div>
+                  <span className="text-[13.5px] text-mute">
+                    <b className="text-bone">{a.whales.length} top traders</b> on{" "}
+                    <span className="rounded-md bg-aqua px-1.5 py-0.5 text-[12px] font-semibold text-ink">{a.outcome}</span>
+                  </span>
+                </div>
+                <div className="mt-6 flex items-end justify-between gap-6">
+                  <div className="flex-1">
+                    <div className="text-[11px] uppercase tracking-[0.16em] text-mute">Consensus</div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-charcoal">
+                      <div className="bar-in h-full rounded-full bg-aqua" style={{ width: `${(a.whales.length / maxWhales) * 100}%`, animationDelay: `${200 + (i % 6) * 70}ms` }} />
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="num text-[24px] font-semibold">{usd(a.value)}</div>
+                    <div className="text-[12px] text-mute">combined</div>
+                  </div>
+                </div>
+              </article>
+            </Tilt>
+          </Reveal>
         ))}
       </div>
-    </div>
+    </>
   );
 }

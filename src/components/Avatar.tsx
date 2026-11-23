@@ -10,7 +10,7 @@ export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; s
         width={size}
         height={size}
         loading="lazy"
-        className="shrink-0 rounded-full object-cover ring-1 ring-line"
+        className="block shrink-0 rounded-full object-cover ring-1 ring-line"
         style={{ width: size, height: size }}
       />
     );
@@ -22,7 +22,7 @@ export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; s
   return (
     <span
       aria-hidden
-      className="shrink-0 rounded-full ring-1 ring-line"
+      className="block shrink-0 rounded-full ring-1 ring-line"
       style={{ width: size, height: size, background: `linear-gradient(135deg, ${a}, ${b})` }}
     />
   );

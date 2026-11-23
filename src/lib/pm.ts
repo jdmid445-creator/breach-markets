@@ -69,7 +69,7 @@ function toTrader(r: Raw, i: number): Trader {
   return {
     rank: num(pick(r, "rank")) || i + 1,
     address,
-    name: str(pick(r, "user_name", "userName", "name")) || short(address),
+    name: displayName(str(pick(r, "user_name", "userName", "name")), address),
     image: str(pick(r, "profile_image", "profileImage")),
     x: str(pick(r, "x_username", "xUsername")),
     verified: Boolean(pick(r, "verified", "verifiedBadge")),
@@ -111,7 +111,7 @@ export async function profile(address: string): Promise<{ name: string; image: s
   const d = json?.data;
   if (!d) return null;
   return {
-    name: str(pick(d, "user_name")) || short(address),
+    name: displayName(str(pick(d, "user_name")), address),
     image: str(pick(d, "profile_image")),
     x: str(pick(d, "x_username")),
     verified: Boolean(pick(d, "verified")),
@@ -151,7 +151,7 @@ function toTrade(r: Raw): Trade {
   return {
     id: `${tx}:${token}:${wallet}:${size}`,
     wallet,
-    name: str(pick(r, "name")) || str(pick(r, "pseudonym")) || short(wallet),
+    name: displayName(str(pick(r, "name")) || str(pick(r, "pseudonym")), wallet),
     image: str(pick(r, "profile_image_optimized", "profile_image", "profileImage")),
     side: str(pick(r, "side")).toUpperCase() === "SELL" ? "SELL" : "BUY",
     outcome: str(pick(r, "outcome")),
@@ -226,9 +226,9 @@ export type Position = {
 };
 
 function toPosition(r: Raw): Position {
-  const size = num(pick(r, "size"));
-  const avgPrice = num(pick(r, "avg_price", "avgPrice"));
-  const curPrice = num(pick(r, "current_price", "cur_price", "curPrice"));
+  const size = num(pick(r, "size", "shares", "tokens", "balance", "quantity"));
+  const avgPrice = num(pick(r, "avg_price", "avgPrice", "average_price"));
+  const curPrice = num(pick(r, "current_price", "cur_price", "curPrice", "price"));
   const value = num(pick(r, "current_value", "currentValue")) || size * curPrice;
   const cost = num(pick(r, "entry_cost_usdc", "initial_value", "initialValue")) || size * avgPrice;
   const unreal = pick(r, "unrealized_pnl", "cash_pnl", "cashPnl");
@@ -253,8 +253,13 @@ function toPosition(r: Raw): Position {
 }
 
 export async function positions(address: string, limit = 25): Promise<Position[]> {
-  const json = await get<{ data?: Raw[] }>("/positions", { user: address, limit, sort_by: "CURRENT_VALUE" }, 120);
-  return json && Array.isArray(json.data) ? json.data.map(toPosition).filter((p) => p.size > 0) : [];
+  let json = await get<{ data?: Raw[] }>("/positions", { user: address, limit, sort_by: "CURRENT_VALUE" }, 120);
+  if (!json || !Array.isArray(json.data)) json = await get<{ data?: Raw[] }>("/positions", { user: address, limit }, 120);
+  if (!json || !Array.isArray(json.data)) return [];
+  return json.data
+    .map(toPosition)
+    .filter((p) => p.value > 0.5 || p.size > 0)
+    .sort((a, b) => b.value - a.value);
 }
 
 /* ---------------- Aggregations ---------------- */
@@ -285,6 +290,12 @@ export function flowBoard(trades: Trade[]): FlowRow[] {
     m.set(t.wallet, r);
   }
   return [...m.values()].sort((a, b) => b.bought + b.sold - (a.bought + a.sold));
+}
+
+const looksLikeAddr = (s: string) => /^0x[a-fA-F0-9]{20,}/.test(s.trim());
+export function displayName(name: string | undefined, addr: string) {
+  const n = (name ?? "").trim();
+  return n && !looksLikeAddr(n) ? n : short(addr);
 }
 
 export function short(addr: string) {

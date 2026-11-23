@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { CATEGORIES, leaderboard, tradesSince, flowBoard, type Period, type SortBy } from "@/lib/pm";
 import { SPORTS } from "@/lib/sports";
 import { TraderTable, FlowTable } from "@/components/TraderTable";
+import { PageHero } from "@/components/PageHero";
+import { Segmented } from "@/components/Segmented";
+import { Podium } from "@/components/Podium";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leaderboards — Breach" };
@@ -50,84 +52,54 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
       sport ? ` in ${SPORTS.find((s) => s.id === sport)!.label}` : ""
     }. Polymarket doesn’t publish profit for this cut, so this shows who’s acting, not who’s right yet.`;
   } else {
-    const rows = await leaderboard({ period: win as Period, category: cat, sort, limit: 100 });
-    board = <TraderTable rows={rows ?? []} sort={sort} />;
+    const rows = (await leaderboard({ period: win as Period, category: cat, sort, limit: 100 })) ?? [];
+    const podium = rows.length >= 3;
+    board = (
+      <>
+        {podium && (
+          <div className="mb-10">
+            <Podium rows={rows} />
+          </div>
+        )}
+        <TraderTable rows={rows} sort={sort} skip={podium ? 3 : 0} />
+      </>
+    );
     note = sort === "PNL" ? "Ranked by profit in the window, straight from Polymarket." : "Ranked by trading volume in the window.";
   }
 
   const catLabel = CATEGORIES.find((c) => c.id === cat)!.label;
 
+  const winLabel = WINDOWS.find((w) => w.id === win)!.label;
+  const headline = `${sport ? SPORTS.find((s) => s.id === sport)!.label : catLabel} · ${winLabel}`;
+
   return (
-    <div className="mx-auto max-w-[1100px] px-5 pt-12">
-      <p className="text-[13px] font-medium uppercase tracking-[0.18em] text-royal-soft">Leaderboards</p>
-      <h1 className="display mt-3 text-[clamp(48px,8vw,92px)]">
-        {sport ? SPORTS.find((s) => s.id === sport)!.label : catLabel}{" "}
-        <span className="text-royal">{WINDOWS.find((w) => w.id === win)!.label}</span>
-      </h1>
-
-      <div className="mt-8 flex flex-wrap gap-1.5">
-        {CATEGORIES.map((c) => (
-          <Chip key={c.id} on={c.id === cat} href={href({ cat: c.id, sport: undefined })}>
-            {c.label}
-          </Chip>
-        ))}
-      </div>
-
-      {cat === "sports" && (
-        <div className="mt-3 flex flex-wrap gap-1.5 border-l-2 border-royal pl-3">
-          <Chip on={!sport} href={href({ sport: undefined })} small>
-            All sports
-          </Chip>
-          {SPORTS.map((s) => (
-            <Chip key={s.id} on={s.id === sport} href={href({ sport: s.id })} small>
-              {s.label}
-            </Chip>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-full border hairline bg-coal p-0.5 text-[13px]">
-          {WINDOWS.map((w) => (
-            <Link
-              key={w.id}
-              href={href({ w: w.id })}
-              className={`rounded-full px-3.5 py-1.5 ${w.id === win ? "bg-aqua text-ink" : "text-mute hover:text-bone"}`}
-            >
-              {w.label}
-            </Link>
-          ))}
-        </div>
-        {!flowMode && (
-          <div className="flex rounded-full border hairline bg-coal p-0.5 text-[13px]">
-            {(["PNL", "VOLUME"] as const).map((s) => (
-              <Link
-                key={s}
-                href={href({ sort: s })}
-                className={`rounded-full px-3.5 py-1.5 ${s === sort ? "bg-charcoal text-bone" : "text-mute hover:text-bone"}`}
-              >
-                {s === "PNL" ? "Profit" : "Volume"}
-              </Link>
-            ))}
+    <>
+      <PageHero kicker="Leaderboards" title={headline} sub={note} compact>
+        <div className="flex flex-col gap-3">
+          <Segmented id="cat" items={CATEGORIES.map((c) => ({ href: href({ cat: c.id, sport: undefined }), label: c.label, active: c.id === cat }))} />
+          {cat === "sports" && (
+            <Segmented
+              id="sport"
+              size="sm"
+              tone="bone"
+              items={[{ href: href({ sport: undefined }), label: "All sports", active: !sport }, ...SPORTS.map((s) => ({ href: href({ sport: s.id }), label: s.label, active: s.id === sport }))]}
+            />
+          )}
+          <div className="flex flex-wrap gap-3">
+            <Segmented id="win" items={WINDOWS.map((w) => ({ href: href({ w: w.id }), label: w.label, active: w.id === win }))} />
+            {!flowMode && (
+              <Segmented
+                id="sort"
+                tone="bone"
+                items={(["PNL", "VOLUME"] as const).map((x) => ({ href: href({ sort: x }), label: x === "PNL" ? "Profit" : "Volume", active: x === sort }))}
+              />
+            )}
           </div>
-        )}
+        </div>
+      </PageHero>
+      <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1240px] px-5">
+        {board}
       </div>
-
-      <p className="mt-4 max-w-[680px] text-[13px] leading-relaxed text-mute">{note}</p>
-      <div className="mt-5">{board}</div>
-    </div>
-  );
-}
-
-function Chip({ href, on, children, small }: { href: string; on: boolean; children: React.ReactNode; small?: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`rounded-full border px-3.5 ${small ? "py-1 text-[12.5px]" : "py-1.5 text-[13.5px]"} transition-colors ${
-        on ? "border-bone bg-bone text-ink" : "hairline text-mute hover:text-bone"
-      }`}
-    >
-      {children}
-    </Link>
+    </>
   );
 }
