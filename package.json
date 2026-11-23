@@ -12,6 +12,8 @@
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/hanken-grotesk": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "d3-contour": "^4.0.3",
@@ -21,10 +23,13 @@
     "next": "15.5.29",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "tailwind-merge": "^3.7.1"
+    "shaders": "^4.0.7",
+    "tailwind-merge": "^3.7.1",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@fontsource/hanken-grotesk": "^5.3.0",
     "@tailwindcss/postcss": "^4",
     "@types/d3-contour": "^3.0.6",
     "@types/d3-geo": "^3.1.1",

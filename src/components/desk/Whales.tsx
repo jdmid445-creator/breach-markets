@@ -1,13 +1,15 @@
 "use client";
 import { useMemo, useState } from "react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { Bell, BellRing, Pause, Play, ArrowUpRight } from "lucide-react";
 import type { Trade } from "@/lib/pm";
 import { usd, cents, ago, tier, pmMarket } from "@/lib/format";
 import { bucketLabel, isSport } from "@/lib/sports";
 import { useWhales, useNow } from "@/lib/useWhales";
-import { Soundings } from "./Soundings";
+import { Sea } from "@/components/fx/Sea";
 import { MarketIcon, RankChip, Empty, Panel, Side } from "./ui";
+import { SplitTitle, Reveal, Counter } from "@/components/fx/motion";
 
 const MARKETS = [
   { id: "all", label: "All" },
@@ -27,47 +29,51 @@ export function HomeLive({ initial }: { initial: Trade[] }) {
   const hour = now ? trades.filter((t) => t.ts >= now - 3600) : trades;
   const total = hour.reduce((s, t) => s + t.usd, 0);
   const ranked = hour.filter((t) => t.rank !== null).length;
-  const biggest = hour.reduce<Trade | null>((b, t) => (!b || t.usd > b.usd ? t : b), null);
 
   return (
-    <>
-      <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pb-7">
+    <section>
+      <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
         <div>
-          <h2 className="title text-[clamp(30px,3.6vw,46px)] text-fg">Whale desk</h2>
-          <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-mist">
-            Every Polymarket bet of $10K or more, who placed it and how good they are. Ranked traders carry their leaderboard rank; the top 10 are marked in red.
-          </p>
+          <SplitTitle as="h2" text="Whales breaking the surface" className="title text-[clamp(36px,5vw,72px)] text-fg" />
+          <Reveal delay={0.3}>
+            <p className="mt-4 max-w-[56ch] text-[16px] leading-relaxed text-mist">
+              Every Polymarket bet of $10K or more, live. Each tail is one bet; the taller it stands, the bigger the bet. Red tails are top-10 traders. Drag the sea to turn it, click a tail to see who placed it.
+            </p>
+          </Reveal>
         </div>
         <dl className="grid grid-cols-3 gap-x-8 gap-y-1 sm:gap-x-12">
-          <Stat label="Whale bets, last hour" value={String(hour.length)} />
-          <Stat label="Money moved" value={usd(total)} />
-          <Stat label="From ranked traders" value={hour.length ? `${Math.round((ranked / hour.length) * 100)}%` : "—"} />
+          <Stat label="Whale bets, last hour" value={<Counter value={hour.length} format="int" />} />
+          <Stat label="Money moved" value={<Counter value={total} />} />
+          <Stat label="From ranked traders" value={<Counter value={hour.length ? (ranked / hour.length) * 100 : 0} format="pct" />} />
         </dl>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-12">
-        <Panel
-          framed
-          title="Whale chart"
-          meta={biggest ? <>biggest this hour {usd(biggest.usd)} by {biggest.name}</> : "last 70 whale bets"}
-          live={status === "live"}
-          className="lg:col-span-8"
-        >
-          <Soundings trades={trades} fresh={fresh} height={470} />
-        </Panel>
-        <Panel title="Latest whales" href="/live" hrefLabel="All alerts" className="lg:col-span-4" bodyClass="max-h-[560px] overflow-y-auto lg:max-h-none lg:basis-0">
-          <WhaleList trades={trades.slice(0, 30)} fresh={fresh} now={now} />
-        </Panel>
+      <div className="mt-8 grid gap-4 lg:grid-cols-12">
+        <Reveal className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl border border-hair-2 bg-shoal/40">
+            <div className="flex items-center gap-2.5 border-b border-hair px-4 py-3">
+              {status === "live" && <span className="live-dot" />}
+              <span className="text-[14.5px] font-semibold text-fg">The sea</span>
+              <span className="text-[13px] text-faint max-sm:hidden">last 60 whale bets, newest in the middle</span>
+            </div>
+            <Sea trades={trades} fresh={fresh} height={600} />
+          </div>
+        </Reveal>
+        <Reveal className="lg:col-span-4" delay={0.12}>
+          <Panel title="Latest whales" href="/live" hrefLabel="All alerts" live={status === "live"} bodyClass="max-h-[600px] overflow-y-auto">
+            <WhaleList trades={trades.slice(0, 30)} fresh={fresh} now={now} />
+          </Panel>
+        </Reveal>
       </div>
-    </>
+    </section>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col-reverse">
       <dt className="mt-1 text-[12.5px] text-faint">{label}</dt>
-      <dd className="fig text-[26px] font-semibold leading-none text-fg">{value}</dd>
+      <dd className="text-[30px] font-semibold leading-none text-fg">{value}</dd>
     </div>
   );
 }
@@ -81,8 +87,15 @@ export function WhaleList({ trades, fresh, now }: { trades: Trade[]; fresh?: Set
         const ranked = t.rank !== null;
         const isNew = fresh?.has(t.id);
         return (
-          <li key={t.id} className={`row border-b border-hair last:border-0 ${isNew ? "row-new row-wash" : ""}`}>
-            <div className="grid grid-cols-[28px_1fr_auto] items-start gap-3 px-3 py-3 sm:px-4">
+          <motion.li
+            key={t.id}
+            layout
+            initial={isNew ? { opacity: 0, y: -18, scale: 0.97 } : false}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+            className={`border-b border-hair last:border-0 ${isNew ? "row-wash" : ""}`}
+          >
+            <div className="spot grid grid-cols-[28px_1fr_auto] items-start gap-3 px-3 py-3 sm:px-4">
               <MarketIcon src={t.icon} label={t.title} size={28} />
               <div className="min-w-0">
                 <div className="flex min-w-0 items-center gap-1.5">
@@ -103,7 +116,7 @@ export function WhaleList({ trades, fresh, now }: { trades: Trade[]; fresh?: Set
                 </div>
               </div>
             </div>
-          </li>
+          </motion.li>
         );
       })}
     </ul>
@@ -225,14 +238,19 @@ export function LiveDesk({ initial }: { initial: Trade[] }) {
         <span className="fig">{rankedCount} from ranked traders</span>
       </p>
 
-      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.75fr)]">
+      <div className="mt-4 grid items-start gap-6 lg:grid-cols-2">
         <div className="overflow-x-auto border-t border-hair-2">
           <WhaleTable trades={shown} fresh={fresh} now={now} />
         </div>
-        <div className="max-lg:order-first lg:sticky lg:top-[76px]">
-          <Panel framed title="Whale chart" meta="the bets on the left, by price and time">
-            <Soundings trades={shown} fresh={fresh} height={520} />
-          </Panel>
+        <div className="max-lg:order-first lg:sticky lg:top-[108px]">
+          <div className="overflow-hidden rounded-xl border border-hair-2 bg-shoal/40">
+            <div className="flex items-center gap-2.5 border-b border-hair px-4 py-3">
+              {status === "live" && !paused && <span className="live-dot" />}
+              <span className="text-[14.5px] font-semibold text-fg">The sea</span>
+              <span className="text-[13px] text-faint max-sm:hidden">the bets on the left, as tails</span>
+            </div>
+            <Sea trades={shown} fresh={fresh} height={620} />
+          </div>
         </div>
       </div>
     </div>
@@ -256,7 +274,14 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
           const ranked = t.rank !== null;
           const tr = tier(t.usd);
           return (
-            <tr key={t.id} className={`row border-b border-hair last:border-0 ${fresh?.has(t.id) ? "row-new row-wash" : ""}`}>
+            <motion.tr
+              key={t.id}
+              layout="position"
+              initial={fresh?.has(t.id) ? { opacity: 0, y: -16 } : false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 380, damping: 32 }}
+              className={`spot border-b border-hair last:border-0 ${fresh?.has(t.id) ? "row-wash" : ""}`}
+            >
               <td className="fig px-3 py-3 sm:px-4 align-top text-[13px] text-faint max-md:hidden" suppressHydrationWarning>
                 {now ? ago(t.ts, now) : ""}
               </td>
@@ -291,7 +316,7 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
                 <div className={`fig text-[16px] font-semibold ${ranked ? "text-fg" : "text-mist"}`}>{usd(t.usd)}</div>
                 {t.usd >= 50_000 && <div className="mt-0.5 whitespace-nowrap text-[12px] text-faint">{tr.label}</div>}
               </td>
-            </tr>
+            </motion.tr>
           );
         })}
       </tbody>

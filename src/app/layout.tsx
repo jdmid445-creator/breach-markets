@@ -8,6 +8,8 @@ import "@fontsource-variable/hanken-grotesk/wght-italic.css";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { DeepBackground } from "@/components/fx/DeepBackground";
+import { CursorFx } from "@/components/fx/CursorFx";
 import { CommandPalette } from "@/components/desk/CommandPalette";
 
 export const metadata: Metadata = {
@@ -37,10 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen">
+        <DeepBackground />
         <Nav />
         <main>{children}</main>
         <Footer />
         <CommandPalette />
+        <CursorFx />
       </body>
     </html>
   );

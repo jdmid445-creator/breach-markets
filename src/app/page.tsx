@@ -3,7 +3,8 @@ import { bigTrades, leaderboard } from "@/lib/pm";
 import { usd, cents, pmMarket } from "@/lib/format";
 import { ScrollIntro } from "@/components/ScrollIntro";
 import { HomeLive } from "@/components/desk/Whales";
-import { BoardSwitch } from "@/components/desk/BoardSwitch";
+import { LeaderHub } from "@/components/fx/LeaderHub";
+import { SplitTitle, Reveal } from "@/components/fx/motion";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
 import { Avatar } from "@/components/Avatar";
 import { podConsensus } from "@/lib/smart";
@@ -12,11 +13,9 @@ import { bucketLabel } from "@/lib/sports";
 export const revalidate = 30;
 
 export default async function Home() {
-  const [feed, weekly, politics, sports, pod] = await Promise.all([
+  const [feed, today, pod] = await Promise.all([
     bigTrades(10_000, 80, 10),
-    leaderboard({ period: "week", category: "overall", sort: "PNL", limit: 8 }),
-    leaderboard({ period: "week", category: "politics", sort: "PNL", limit: 8 }),
-    leaderboard({ period: "week", category: "sports", sort: "PNL", limit: 8 }),
+    leaderboard({ period: "day", category: "overall", sort: "PNL", limit: 20 }),
     podConsensus(15).catch(() => []),
   ]);
   const trades = feed ?? [];
@@ -43,25 +42,25 @@ export default async function Home() {
       {/* seam: the intro's night water hands off to the desk */}
       <div aria-hidden className="h-24 bg-[linear-gradient(180deg,#0a0f26,#03203d)]" />
 
-      <div className="mx-auto max-w-[1360px] px-5 pt-10 md:px-8">
-        <HomeLive initial={trades} />
+      <div className="mx-auto max-w-[1360px] px-5 pt-28 md:px-8">
+        <LeaderHub initial={today ?? []} />
 
-        <div className="mt-14 grid gap-x-8 gap-y-12 lg:grid-cols-12">
-          <BoardSwitch
-            className="lg:col-span-5"
-            boards={[
-              { id: "overall", label: "All markets", href: "/leaderboard?w=week", rows: weekly },
-              { id: "politics", label: "Politics", href: "/leaderboard?cat=politics&w=week", rows: politics },
-              { id: "sports", label: "Sports", href: "/leaderboard?cat=sports&w=week", rows: sports },
-            ]}
-          />
-          <Panel title="Smart money" meta="bets the month’s top 15 traders share" href="/smart-money" hrefLabel="All shared bets" className="lg:col-span-7">
+        <div className="mt-32">
+          <HomeLive initial={trades} />
+        </div>
+
+        <div className="mt-32">
+          <SplitTitle as="h2" text="Where the money is" className="title text-[clamp(36px,5vw,72px)] text-fg" />
+        </div>
+        <div className="mt-10 grid gap-x-8 gap-y-12 lg:grid-cols-12">
+          <Reveal className="lg:col-span-12">
+          <Panel title="Smart money" meta="bets the month’s top 15 traders share" href="/smart-money" hrefLabel="All shared bets" className="lg:col-span-12">
             {pod.length === 0 ? (
               <Empty>None of the top traders share a position right now.</Empty>
             ) : (
               <ul>
                 {pod.slice(0, 6).map((p) => (
-                  <li key={p.key} className="row grid grid-cols-[34px_1fr_auto] items-center gap-4 border-b border-hair px-4 py-3 last:border-0 sm:grid-cols-[34px_1fr_120px_96px]">
+                  <li key={p.key} className="spot grid grid-cols-[34px_1fr_auto] items-center gap-4 border-b border-hair px-4 py-3 last:border-0 sm:grid-cols-[34px_1fr_120px_96px]">
                     <MarketIcon src={p.icon} label={p.title} size={34} />
                     <div className="min-w-0">
                       <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="block truncate text-[14.5px] text-fg hover:underline">
@@ -94,8 +93,10 @@ export default async function Home() {
               </ul>
             )}
           </Panel>
+          </Reveal>
 
-          <Panel title="Where the money is" meta="the recent whale bets above" className="lg:col-span-12" bodyClass="grid gap-x-16 gap-y-8 px-4 py-5 md:grid-cols-2">
+          <Reveal className="lg:col-span-12" delay={0.1}>
+          <Panel title="Whale money by market and size" meta="the recent whale bets above" className="lg:col-span-12" bodyClass="grid gap-x-16 gap-y-8 px-4 py-5 md:grid-cols-2">
             {mixTop.length === 0 ? (
               <Empty>No whale bets yet.</Empty>
             ) : (
@@ -135,6 +136,7 @@ export default async function Home() {
               </>
             )}
           </Panel>
+          </Reveal>
         </div>
       </div>
     </>

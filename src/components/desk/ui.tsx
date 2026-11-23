@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { SplitTitle, Reveal } from "@/components/fx/motion";
 
 /** A work area on the desk: hairline frame, a plain title row, optional link out. */
 export function Panel({
@@ -44,17 +45,25 @@ export function Panel({
 }
 
 /** Page header for desk pages: a real title, one sentence, then the page's controls. */
-export function PageHeader({ title, sub, aside, children }: { title: React.ReactNode; sub?: React.ReactNode; aside?: React.ReactNode; children?: React.ReactNode }) {
+export function PageHeader({ title, sub, aside, children }: { title: string; sub?: React.ReactNode; aside?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <header className="mx-auto max-w-[1360px] px-5 pb-6 pt-32 sm:pt-24 md:px-8">
+    <header className="mx-auto max-w-[1360px] px-5 pb-6 pt-40 sm:pt-32 md:px-8">
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
         <div className="min-w-0">
-          <h1 className="title text-[clamp(30px,3.6vw,46px)] text-fg">{title}</h1>
-          {sub && <p className="mt-3 max-w-[62ch] text-[15px] leading-relaxed text-mist">{sub}</p>}
+          <SplitTitle as="h1" text={title} className="title text-[clamp(40px,6vw,84px)] text-fg" />
+          {sub && (
+            <Reveal delay={0.3} y={14}>
+              <p className="mt-4 max-w-[62ch] text-[16px] leading-relaxed text-mist">{sub}</p>
+            </Reveal>
+          )}
         </div>
         {aside}
       </div>
-      {children && <div className="mt-7">{children}</div>}
+      {children && (
+        <Reveal delay={0.45} y={14}>
+          <div className="mt-8">{children}</div>
+        </Reveal>
+      )}
     </header>
   );
 }

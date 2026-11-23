@@ -5,7 +5,8 @@ import { usd, cents, ago, pmMarket, pmProfile } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
 import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified, Side } from "@/components/desk/ui";
-import { Soundings } from "@/components/desk/Soundings";
+import { Sea } from "@/components/fx/Sea";
+import { Counter, Reveal, SplitTitle } from "@/components/fx/motion";
 import { CopyAddress } from "@/components/desk/CopyAddress";
 
 export const dynamic = "force-dynamic";
@@ -52,12 +53,12 @@ export default async function TraderPage({ params }: { params: Promise<{ address
 
   return (
     <>
-      <header className="mx-auto max-w-[1360px] px-5 pb-7 pt-32 sm:pt-24 md:px-8">
+      <header className="mx-auto max-w-[1360px] px-5 pb-7 pt-40 sm:pt-32 md:px-8">
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <Avatar src={image} seed={address} name={name} size={76} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="title truncate text-[clamp(30px,3.6vw,46px)] text-fg">{name}</h1>
+              <SplitTitle as="h1" text={name} className="title truncate text-[clamp(40px,6vw,80px)] text-fg" />
               {prof?.verified && <Verified />}
             </div>
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px] text-mist">
@@ -90,8 +91,8 @@ export default async function TraderPage({ params }: { params: Promise<{ address
 
       <div className="mx-auto max-w-[1360px] px-5 md:px-8">
         <div className="grid gap-x-8 gap-y-10 lg:grid-cols-12">
-          <Panel framed className="self-start lg:col-span-8" title="Their bets, charted" meta={`last ${Math.min(trades.length, 60)} trades`}>
-            <Soundings trades={trades} height={400} plain label={`${name}'s recent bets plotted by price and time`} />
+          <Panel framed className="self-start lg:col-span-8" title="Their bets, as tails" meta={`last ${Math.min(trades.length, 60)} trades`}>
+            <Sea trades={trades} height={460} />
           </Panel>
           <div className="grid content-start gap-10 lg:col-span-4">
             <Panel title="Profit by window">
@@ -115,7 +116,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                         <td className="px-4 py-2.5 text-right">
                           {st ? (
                             <Pnl value={st.pnl} className="text-[17px]">
-                              {usd(st.pnl, { sign: true })}
+                              <Counter value={st.pnl} sign />
                             </Pnl>
                           ) : (
                             <span className="text-faint">—</span>
@@ -130,12 +131,12 @@ export default async function TraderPage({ params }: { params: Promise<{ address
             </Panel>
             <Panel title="Right now" bodyClass="px-4 py-1">
               <dl className="divide-y divide-hair">
-                <Row label="Open positions" value={<span className="fig text-fg">{usd(openValue)}</span>} sub={`${pos.length} markets`} />
+                <Row label="Open positions" value={<span className="text-fg"><Counter value={openValue} /></span>} sub={`${pos.length} markets`} />
                 <Row
                   label="Unrealized P&L"
                   value={
                     pos.length ? (
-                      <Pnl value={openPnl}>{usd(openPnl, { sign: true })}</Pnl>
+                      <Pnl value={openPnl}><Counter value={openPnl} sign /></Pnl>
                     ) : (
                       <span className="text-faint">—</span>
                     )
@@ -169,8 +170,8 @@ export default async function TraderPage({ params }: { params: Promise<{ address
           </div>
         </div>
 
-        <section className="mt-12">
-          <h2 className="title text-[24px] text-fg">Open positions</h2>
+        <Reveal className="mt-16">
+          <h2 className="title text-[clamp(26px,3vw,40px)] text-fg">Open positions</h2>
           <div className="mt-4 overflow-x-auto border-t border-hair-2">
             {pos.length === 0 ? (
               <Empty>No open positions right now.</Empty>
@@ -216,10 +217,10 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               </table>
             )}
           </div>
-        </section>
+        </Reveal>
 
-        <section className="mt-12">
-          <h2 className="title text-[24px] text-fg">Recent trades</h2>
+        <Reveal className="mt-16">
+          <h2 className="title text-[clamp(26px,3vw,40px)] text-fg">Recent trades</h2>
           <div className="mt-4 overflow-x-auto border-t border-hair-2">
             {trades.length === 0 ? (
               <Empty>No recent trades.</Empty>
@@ -255,7 +256,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               </table>
             )}
           </div>
-        </section>
+        </Reveal>
       </div>
     </>
   );
@@ -281,7 +282,7 @@ function PriceTrack({ from, to }: { from: number; to: number }) {
   return (
     <span className="relative block h-[6px] flex-1 rounded-full bg-reef" aria-hidden>
       <span
-        className={`absolute inset-y-0 rounded-full ${up ? "bg-stone-hi/80" : "bg-faint/80"}`}
+        className={`bar-in absolute inset-y-0 rounded-full ${up ? "bg-stone-hi/80" : "bg-faint/80"}`}
         style={{ left: `${Math.min(a, b)}%`, width: `${Math.max(1.5, Math.abs(b - a))}%` }}
       />
       <span className="absolute -top-[3px] h-[12px] w-[2px] rounded-full bg-fg" style={{ left: `${a}%` }} />

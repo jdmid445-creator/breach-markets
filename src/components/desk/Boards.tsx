@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import { ArrowDown } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import type { Trader, FlowRow } from "@/lib/pm";
 import { usd } from "@/lib/format";
 import { Avatar } from "@/components/Avatar";
@@ -34,7 +36,8 @@ export function MiniBoard({ rows }: { rows: Trader[] | null }) {
 }
 
 /** The full leaderboard. Sortable by profit or volume through the header links. */
-export function TraderTable({ rows, sort, sortHref }: { rows: Trader[]; sort: "PNL" | "VOLUME"; sortHref: (s: "PNL" | "VOLUME") => string }) {
+export function TraderTable({ rows, sort, sortHrefs, skip = 0 }: { rows: Trader[]; sort: "PNL" | "VOLUME"; sortHrefs: { PNL: string; VOLUME: string }; skip?: number }) {
+  const reduce = useReducedMotion();
   if (!rows.length) return <Empty>Polymarket didn’t return data for this board. Try another window or refresh in a moment.</Empty>;
   const max = Math.max(...rows.map((r) => Math.abs(sort === "PNL" ? r.pnl : r.volume)), 1);
   return (
@@ -44,21 +47,29 @@ export function TraderTable({ rows, sort, sortHref }: { rows: Trader[]; sort: "P
           <th className="w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
           <th className="px-3 py-2.5 sm:px-4 font-normal">Trader</th>
           <th className="w-[26%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden" aria-hidden />
-          <SortTh active={sort === "PNL"} href={sortHref("PNL")}>
+          <SortTh active={sort === "PNL"} href={sortHrefs.PNL}>
             Profit
           </SortTh>
-          <SortTh active={sort === "VOLUME"} href={sortHref("VOLUME")} className="max-sm:hidden">
+          <SortTh active={sort === "VOLUME"} href={sortHrefs.VOLUME} className="max-sm:hidden">
             Volume
           </SortTh>
         </tr>
       </thead>
       <tbody>
-        {rows.map((t, i) => {
+        {rows.slice(skip).map((t, j) => {
+          const i = j + skip;
           const v = sort === "PNL" ? t.pnl : t.volume;
           const rank = t.rank || i + 1;
           const podium = rank <= 3;
           return (
-            <tr key={`${t.address}-${i}`} className="row border-b border-hair last:border-0">
+            <motion.tr
+              key={`${t.address}-${i}`}
+              initial={reduce ? false : { opacity: 0, x: -20, filter: "blur(6px)" }}
+              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "0px 0px -5% 0px" }}
+              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: Math.min(j, 12) * 0.035 }}
+              className="spot border-b border-hair last:border-0"
+            >
               <td className="px-3 py-3 sm:px-4">
                 <span className={`fig ${podium ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{rank}</span>
               </td>
@@ -88,7 +99,7 @@ export function TraderTable({ rows, sort, sortHref }: { rows: Trader[]; sort: "P
                 </Pnl>
               </td>
               <td className="fig px-3 py-3 sm:px-4 text-right text-[14px] text-mist max-sm:hidden">{usd(t.volume)}</td>
-            </tr>
+            </motion.tr>
           );
         })}
       </tbody>
@@ -108,7 +119,7 @@ function SortTh({ active, href, children, className = "" }: { active: boolean; h
 }
 
 /** Flow board: who moved the most money, for cuts Polymarket doesn't rank. */
-export function FlowTable({ rows }: { rows: FlowRow[] }) {
+export function FlowTable({ rows, offset = 0 }: { rows: FlowRow[]; offset?: number }) {
   if (!rows.length) return <Empty>No $1K+ bets in this window yet.</Empty>;
   return (
     <table className="w-full border-collapse text-left">
@@ -122,8 +133,8 @@ export function FlowTable({ rows }: { rows: FlowRow[] }) {
       </thead>
       <tbody>
         {rows.map((r, i) => (
-          <tr key={r.address} className="row border-b border-hair last:border-0">
-            <td className={`fig px-3 py-3 sm:px-4 ${i < 3 ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{i + 1}</td>
+          <tr key={r.address} className="spot border-b border-hair last:border-0">
+            <td className={`fig px-3 py-3 sm:px-4 ${i + offset < 3 ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{i + 1 + offset}</td>
             <td className="w-full max-w-0 px-3 py-3 sm:px-4">
               <Link href={`/trader/${r.address}`} className="group flex min-w-0 items-center gap-3">
                 <Avatar src={r.image} seed={r.address} name={r.name} size={34} />

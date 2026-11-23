@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Search } from "lucide-react";
 import { LogoMark } from "./Logo";
+import { WhaleTape } from "./fx/WhaleTape";
 
 const LINKS = [
   { href: "/live", label: "Alerts" },
@@ -76,6 +77,7 @@ export function Nav() {
           <kbd className="ml-auto rounded border border-hair px-1.5 text-[11.5px] text-faint max-sm:hidden">⌘K</kbd>
         </button>
       </div>
+      <WhaleTape />
       {/* small screens: the three destinations as a second row */}
       <nav aria-label="Main" className="flex border-t border-hair sm:hidden">
         {LINKS.map((l) => {
