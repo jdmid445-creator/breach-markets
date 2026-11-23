@@ -112,7 +112,7 @@ export function WhaleFeed({ initial, compact = false, limit = 60, pool = false }
               const n = Math.round(Number(custom.replace(/[^0-9.]/g, "")) * (/k$/i.test(custom.trim()) ? 1000 : /m$/i.test(custom.trim()) ? 1e6 : 1));
               if (n >= 1000) setMin(n);
             }}
-            className={`flex items-center rounded-full border bg-coal/70 pl-3 pr-1 text-[13px] backdrop-blur-md ${SIZES.includes(min) ? "border-line" : "border-aqua/60"}`}
+            className={`flex items-center rounded-full border bg-coal/70 pl-3 pr-1 text-[13px] ${SIZES.includes(min) ? "border-line" : "border-aqua/60"}`}
           >
             <span className="text-mute">$</span>
             <input
@@ -139,7 +139,7 @@ export function WhaleFeed({ initial, compact = false, limit = 60, pool = false }
           />
           <button
             onClick={() => setPaused((p) => !p)}
-            className="ml-auto rounded-full border border-line bg-coal/70 px-4 py-2 text-[13px] text-mute backdrop-blur-md hover:border-aqua/50 hover:text-aqua"
+            className="ml-auto rounded-full border border-line bg-coal/70 px-4 py-2 text-[13px] text-mute hover:border-aqua/50 hover:text-aqua"
           >
             {paused ? "Resume" : "Pause"}
           </button>
@@ -241,7 +241,7 @@ function Toggle({ on, onClick, label, icon }: { on: boolean; onClick: () => void
     <button
       onClick={onClick}
       aria-pressed={on}
-      className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] backdrop-blur-md transition-colors ${
+      className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] transition-colors ${
         on ? "border-aqua/60 bg-aqua/10 text-aqua" : "border-line bg-coal/70 text-mute hover:text-bone"
       }`}
     >
@@ -271,7 +271,7 @@ function Seg<T extends string | number>({
 }) {
   const id = options.map((o) => o.v).join("-");
   return (
-    <div className="flex rounded-full border border-line bg-coal/70 p-1 text-[13px] backdrop-blur-md">
+    <div className="flex rounded-full border border-line bg-coal/70 p-1 text-[13px]">
       {options.map((o) => (
         <button
           key={String(o.v)}
@@ -281,7 +281,7 @@ function Seg<T extends string | number>({
           {value === o.v && (
             <motion.span
               layoutId={`feedseg-${id}`}
-              className="absolute inset-0 rounded-full bg-aqua shadow-[0_0_24px_rgba(116,255,237,.35)]"
+              className="absolute inset-0 rounded-full bg-aqua"
               transition={{ type: "spring", stiffness: 420, damping: 34 }}
             />
           )}

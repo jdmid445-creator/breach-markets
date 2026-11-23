@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring, useTransform, useMotionValueEvent, useReducedMotion } from "motion/react";
 import { INTRO } from "@/lib/media";
-import { SplitFlap } from "./SplitFlap";
 import { Particles } from "./Particles";
 
 /**
@@ -11,7 +10,7 @@ import { Particles } from "./Particles";
  * 0.00–0.62  the dive: underwater clip plays while the story lines scroll by
  * 0.55–1.00  the breach: the second clip plays, BREACH lands over the splash
  */
-export function ScrollIntro({ stats }: { stats: { label: string; value: string }[] }) {
+export function ScrollIntro() {
   const wrap = useRef<HTMLDivElement>(null);
   const dive = useRef<HTMLVideoElement>(null);
   const breach = useRef<HTMLVideoElement>(null);
@@ -56,10 +55,6 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
   const tail = useTransform(p, [0.8, 0.9], [0, 1]);
   const tailY = useTransform(p, [0.8, 0.92], [30, 0]);
   const hint = useTransform(p, [0, 0.04], [1, 0]);
-  const [statsOn, setStatsOn] = useState(false);
-  useMotionValueEvent(tail, "change", (v) => {
-    if (v > 0.6 && !statsOn) setStatsOn(true);
-  });
 
   return (
     <section id="intro" ref={wrap} className="relative" style={{ height: reduce ? "100vh" : "460vh" }} aria-label="Breach intro">
@@ -113,7 +108,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
           <motion.h1
             style={reduce ? {} : { opacity: word, scale: wordScale, filter: wordBlur, letterSpacing: tracking }}
-            className="display text-[clamp(64px,14.5vw,230px)] font-[200] text-bone drop-shadow-[0_8px_60px_rgba(10,15,38,.6)]"
+            className="display text-[clamp(64px,14.5vw,230px)] font-[200] text-bone"
           >
             Breach
           </motion.h1>
@@ -121,22 +116,12 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
             <p className="max-w-[560px] text-[17px] leading-relaxed text-bone/80">
               See the whales before the market does. Every $10K+ Polymarket bet, the sharpest traders by sport and hour, and what they’re holding now.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/live" className="rounded-full bg-aqua px-7 py-3.5 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-0.5">
-                Open whale alerts
-              </Link>
-              <Link href="/leaderboard" className="rounded-full border border-bone/25 bg-ink/40 px-7 py-3.5 text-[15px] font-semibold text-bone backdrop-blur hover:border-bone/60">
-                Leaderboards
-              </Link>
-            </div>
-            <dl className="mt-12 grid grid-cols-3 gap-8 text-left">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <dt className="text-[11px] uppercase tracking-[0.16em] text-bone/60">{s.label}</dt>
-                  <dd className="num mt-1.5 text-[clamp(18px,2.4vw,26px)] font-semibold text-bone">{statsOn ? <SplitFlap value={s.value} /> : s.value}</dd>
-                </div>
-              ))}
-            </dl>
+            <Link
+              href="/live"
+              className="mt-9 inline-flex items-center gap-3 rounded-full bg-aqua px-7 py-3.5 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-0.5"
+            >
+              Open whale alerts <span aria-hidden>→</span>
+            </Link>
           </motion.div>
         </div>
 

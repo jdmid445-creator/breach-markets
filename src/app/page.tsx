@@ -6,8 +6,7 @@ import { WhaleFeed } from "@/components/WhaleFeed";
 import { Avatar } from "@/components/Avatar";
 import { BubblePool } from "@/components/BubblePool";
 import { ScrollIntro } from "@/components/ScrollIntro";
-import { Reveal, Magnetic } from "@/components/fx";
-import { TextReveal } from "@/components/unlumen/text-reveal";
+import { Magnetic } from "@/components/fx";
 import { WaterConsole } from "@/components/WaterConsole";
 import { Particles } from "@/components/Particles";
 import { podConsensus } from "@/lib/smart";
@@ -24,18 +23,10 @@ export default async function Home() {
     podConsensus(15).catch(() => []),
   ]);
   const trades = feed ?? [];
-  const moved = trades.reduce((s, t) => s + t.usd, 0);
-  const biggest = [...trades].sort((a, b) => b.usd - a.usd)[0];
 
   return (
     <>
-      <ScrollIntro
-        stats={[
-          { label: "Latest whale bets", value: String(trades.length) },
-          { label: "Money in them", value: usd(moved) },
-          { label: "Biggest one", value: biggest ? usd(biggest.usd) : "—" },
-        ]}
-      />
+      <ScrollIntro />
 
       <Tape trades={trades} />
 
@@ -47,7 +38,7 @@ export default async function Home() {
         <div className="caustics pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(180deg,transparent_0%,transparent_14%,#000_30%)]" aria-hidden />
         <Particles density={45} />
         <div className="relative mx-auto max-w-[1240px] px-5">
-          <Reveal>
+          <div>
             <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">The pool</p>
             <h2 className="display mt-4 text-[clamp(44px,7vw,104px)]">
               Every bubble is <b>a bet</b>
@@ -55,25 +46,25 @@ export default async function Home() {
             <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-mute">
               Size is dollars. Filled bubbles are buys, hollow ones are sells, and anything over $250K glows pink. Hover to read it, click to follow the wallet.
             </p>
-          </Reveal>
-          <Reveal delay={150} className="mt-10">
+          </div>
+          <div className="mt-10">
             <BubblePool trades={trades} height={500} />
-          </Reveal>
+          </div>
 
           <div className="mt-28 flex items-end justify-between gap-4">
-            <Reveal>
+            <div>
               <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">Live</p>
               <h2 className="display mt-4 text-[clamp(40px,6vw,84px)]">Surfacing <b>now</b></h2>
-            </Reveal>
+            </div>
             <Magnetic>
               <Link href="/live" className="rounded-full border border-aqua/40 px-5 py-2.5 text-[14px] text-aqua hover:bg-aqua hover:text-ink">
                 Full feed →
               </Link>
             </Magnetic>
           </div>
-          <Reveal delay={120} className="mt-8 pb-28">
+          <div className="mt-8 pb-28">
             <WhaleFeed initial={trades} compact limit={8} />
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -83,7 +74,7 @@ export default async function Home() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2b8f86]">Leaderboards</p>
-              <TextReveal as="h2" text="Who’s printing" className="display mt-4 text-[clamp(44px,7vw,104px)]" />
+              <h2 className="display mt-4 text-[clamp(44px,7vw,104px)]">Who’s printing</h2>
             </div>
             <Magnetic>
               <Link href="/leaderboard" className="rounded-full bg-abyss px-5 py-2.5 text-[14px] font-semibold text-bone">
@@ -92,9 +83,9 @@ export default async function Home() {
             </Magnetic>
           </div>
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            <Reveal delay={0}><MiniBoard title="Today · overall" rows={overall} href="/leaderboard?cat=overall&w=day" /></Reveal>
-            <Reveal delay={120}><MiniBoard title="This week · politics" rows={politics} href="/leaderboard?cat=politics&w=week" /></Reveal>
-            <Reveal delay={240}><MiniBoard title="This week · sports" rows={sports} href="/leaderboard?cat=sports&w=week" /></Reveal>
+            <div><MiniBoard title="Today · overall" rows={overall} href="/leaderboard?cat=overall&w=day" /></div>
+            <div><MiniBoard title="This week · politics" rows={politics} href="/leaderboard?cat=politics&w=week" /></div>
+            <div><MiniBoard title="This week · sports" rows={sports} href="/leaderboard?cat=sports&w=week" /></div>
           </div>
         </div>
       </section>
@@ -105,13 +96,9 @@ export default async function Home() {
         <div className="contours drift absolute -inset-[8%] opacity-70" aria-hidden />
         <div className="relative mx-auto max-w-[1240px] px-5 py-32 text-center">
           <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">Smart money</p>
-          <TextReveal
-            as="h2"
-            text="When the top 30 swim the same way, you’ll see it first"
-            className="display mx-auto mt-5 max-w-[1000px] text-[clamp(40px,6.4vw,92px)] !leading-[0.98]"
-          />
+          <h2 className="display mx-auto mt-5 max-w-[1000px] text-[clamp(40px,6.4vw,92px)] !leading-[0.98]">When the top 30 swim the same way, you’ll see it first</h2>
           <Magnetic className="mt-12">
-            <Link href="/smart-money" className="inline-flex rounded-full bg-aqua px-8 py-4 text-[16px] font-semibold text-ink shadow-[0_0_60px_rgba(116,255,237,.35)]">
+            <Link href="/smart-money" className="inline-flex rounded-full bg-aqua px-8 py-4 text-[16px] font-semibold text-ink">
               Follow the pod →
             </Link>
           </Magnetic>

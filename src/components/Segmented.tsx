@@ -15,7 +15,7 @@ export function Segmented({
   tone?: "aqua" | "bone";
 }) {
   return (
-    <div className="relative flex flex-wrap rounded-full border border-line bg-coal/70 p-1 backdrop-blur-md">
+    <div className="relative flex flex-wrap rounded-full border border-line bg-coal/70 p-1">
       {items.map((it) => (
         <Link
           key={it.href}
@@ -28,7 +28,7 @@ export function Segmented({
           {it.active && (
             <motion.span
               layoutId={`seg-${id}`}
-              className={`absolute inset-0 rounded-full ${tone === "aqua" ? "bg-aqua shadow-[0_0_24px_rgba(116,255,237,.35)]" : "bg-bone"}`}
+              className={`absolute inset-0 rounded-full ${tone === "aqua" ? "bg-aqua" : "bg-bone"}`}
               transition={{ type: "spring", stiffness: 420, damping: 34 }}
             />
           )}

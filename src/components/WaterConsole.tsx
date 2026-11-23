@@ -105,13 +105,13 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
     <section
       ref={section}
       className="plex relative border-t border-aqua/10"
-      style={{ minHeight: "420svh", background: "radial-gradient(circle at 86% 30%, rgba(116,255,237,.10), transparent 26rem), #070b1d" }}
+      style={{ minHeight: "420svh", background: "#0a0f26" }}
     >
       <h2 className="sr-only">What Breach reads</h2>
       <div className="sticky top-0 grid h-[100svh] grid-cols-[minmax(170px,.24fr)_minmax(0,.76fr)] gap-[clamp(28px,5vw,72px)] overflow-hidden px-[clamp(20px,5vw,72px)] py-[clamp(48px,7vw,86px)] max-[820px]:grid-cols-1 max-[820px]:grid-rows-[auto_1fr] max-[820px]:gap-5 max-[820px]:py-8">
         {/* Tabs */}
         <div className="self-start pt-3 max-[820px]:pt-0">
-          <p className="plex-mono mb-8 text-[11px] uppercase tracking-[0.12em] text-bone/40 max-[820px]:mb-4">/ read the water</p>
+          <p className="plex-mono mb-8 text-[12px] text-bone/55 max-[820px]:mb-4">/ read the water</p>
           <div role="tablist" className="grid gap-4 max-[820px]:grid-cols-2 max-[820px]:gap-3">
             {CARDS.map((c, i) => (
               <button
@@ -120,7 +120,7 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
                 aria-selected={active === i}
                 onClick={() => jump(i)}
                 className={`plex-mono flex items-center text-left text-[11px] uppercase tracking-[0.08rem] transition-[color,transform] duration-200 ${
-                  active === i ? "translate-x-0.5 text-aqua" : "text-bone/40 hover:text-bone/70"
+                  active === i ? "translate-x-0.5 text-aqua" : "text-bone/55 hover:text-bone/80"
                 }`}
               >
                 <span className={`mr-3 inline-block h-[7px] w-[7px] rounded-[1px] bg-current transition-transform duration-300 ${active === i ? "rotate-45" : ""}`} />
@@ -128,7 +128,7 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
               </button>
             ))}
           </div>
-          <div className="plex-mono mt-10 text-[11px] text-bone/35 max-[820px]:hidden">
+          <div className="plex-mono mt-10 text-[12px] text-bone/50 max-[820px]:hidden">
             {String(active + 1).padStart(2, "0")} / {String(CARDS.length).padStart(2, "0")}
             <div className="mt-3 h-px w-32 bg-bone/10">
               <div className="h-px bg-aqua transition-[width] duration-500" style={{ width: `${((active + 1) / CARDS.length) * 100}%` }} />
@@ -144,7 +144,7 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
               ref={(el) => {
                 cards.current[i] = el;
               }}
-              className="absolute inset-0 grid grid-cols-[minmax(230px,.36fr)_minmax(320px,.64fr)] border-t border-bone/20 bg-[#070b1d] will-change-[transform,clip-path] max-[820px]:grid-cols-1 max-[820px]:grid-rows-[auto_1fr]"
+              className="absolute inset-0 grid grid-cols-[minmax(230px,.36fr)_minmax(320px,.64fr)] border-t border-bone/20 bg-ink will-change-[transform,clip-path] max-[820px]:grid-cols-1 max-[820px]:grid-rows-[auto_1fr]"
               style={{ transform: i === 0 ? "translateY(0)" : "translateY(100%)" }}
             >
               <div className="pr-8 pt-5 max-[820px]:pb-5 max-[820px]:pr-0">
@@ -162,10 +162,7 @@ export function WaterConsole({ trades, leaders, pod }: { trades: Trade[]; leader
               </div>
               <div
                 className="relative flex min-h-full items-center overflow-hidden p-[clamp(26px,4.5vw,60px)]"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(116,255,237,.88), rgba(43,111,134,.78) 55%, rgba(23,31,68,.92)), radial-gradient(circle at 15% 20%, rgba(234,246,245,.6), transparent 20rem)",
-                }}
+                style={{ background: "#5fd9cb" }}
               >
                 <div className="contours pointer-events-none absolute -inset-[10%] opacity-40 mix-blend-overlay" aria-hidden />
                 <div className="relative w-full transition-transform duration-700 ease-[cubic-bezier(.2,.8,.2,1)]" style={{ transform: active === i ? "translateY(0) scale(1)" : "translateY(14px) scale(.97)" }}>{c.visual}</div>
@@ -284,7 +281,7 @@ function ProfileWindow({ t, trades, on }: { t?: Trader; trades: Trade[]; on: boo
   return (
     <Window title="whale profile">
       <div className="flex items-center gap-3">
-        <div className={`rounded-full p-[2px] transition-shadow duration-700 ${on ? "shadow-[0_0_0_2px_#74ffed,0_0_24px_rgba(116,255,237,.5)]" : ""}`}>
+        <div className={`rounded-full p-[2px] transition-shadow duration-700 ${on ? "shadow-[0_0_0_2px_#74ffed]" : ""}`}>
           <Avatar src={t.image} seed={t.address} size={40} />
         </div>
         <div className="min-w-0">

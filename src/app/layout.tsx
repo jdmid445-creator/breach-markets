@@ -12,10 +12,27 @@ import { Nav } from "@/components/Nav";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Breach — Polymarket whale tracker",
-  description: "See the whales before the market does. Live $10K+ Polymarket bets, leaderboards by category and sport, and what the smartest wallets are holding.",
-  openGraph: { title: "Breach", description: "See the whales before the market does." },
+  metadataBase: new URL("https://breach-markets.vercel.app"),
+  title: { default: "Breach — Polymarket whale tracker", template: "%s" },
+  description:
+    "See the whales before the market does. Live $10K+ Polymarket bets with trader ranks, leaderboards by category, sport and hour, and what the top wallets are holding.",
+  applicationName: "Breach",
+  keywords: ["Polymarket", "whale tracker", "prediction markets", "Polymarket leaderboard", "smart money"],
+  openGraph: {
+    type: "website",
+    siteName: "Breach",
+    title: "Breach — See the whales before the market does",
+    description: "Live $10K+ Polymarket bets with trader ranks, leaderboards and smart-money consensus.",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Breach — See the whales before the market does",
+    description: "Live $10K+ Polymarket bets with trader ranks, leaderboards and smart-money consensus.",
+  },
 };
+
+export const viewport = { themeColor: "#0a0f26" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

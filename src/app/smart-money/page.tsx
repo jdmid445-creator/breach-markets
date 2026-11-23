@@ -4,7 +4,7 @@ import { usd, cents, pmMarket } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
 import { PageHero } from "@/components/PageHero";
-import { Reveal, Tilt } from "@/components/fx";
+import { Tilt } from "@/components/fx";
 
 export const revalidate = 600;
 export const metadata = { title: "Smart money — Breach" };
@@ -61,14 +61,12 @@ export default async function SmartMoneyPage() {
           </div>
         )}
         {rows.map((a, i) => (
-          <Reveal key={a.key} delay={(i % 6) * 70} className={i === 0 ? "md:col-span-2" : ""}>
+          <div key={a.key} className={i === 0 ? "md:col-span-2" : ""}>
             <Tilt className="group h-full rounded-[28px]">
               <article
-                className={`glass relative h-full overflow-hidden rounded-[28px] px-6 py-6 transition-colors group-hover:border-aqua/40 ${
-                  i === 0 ? "bg-[radial-gradient(circle_at_85%_0%,rgba(116,255,237,.16),rgba(16,23,58,.85)_55%)] md:px-9 md:py-9" : ""
-                }`}
+                className={`glass relative h-full overflow-hidden rounded-[28px] px-6 py-6 ${i === 0 ? "bg-charcoal md:px-9 md:py-9" : ""}`}
               >
-                <div className="flex items-center justify-between text-[11.5px] uppercase tracking-[0.16em] text-mute">
+                <div className="flex items-center justify-between text-[13px] text-mute">
                   <span>
                     <span className="num text-aqua">{String(i + 1).padStart(2, "0")}</span> · {bucketLabel(a.bucket)}
                   </span>
@@ -103,7 +101,7 @@ export default async function SmartMoneyPage() {
                 </div>
                 <div className="mt-6 flex items-end justify-between gap-6">
                   <div className="flex-1">
-                    <div className="text-[11px] uppercase tracking-[0.16em] text-mute">Consensus</div>
+                    <div className="text-[13px] text-mute">Consensus</div>
                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-charcoal">
                       <div className="bar-in h-full rounded-full bg-aqua" style={{ width: `${(a.whales.length / maxWhales) * 100}%`, animationDelay: `${200 + (i % 6) * 70}ms` }} />
                     </div>
@@ -115,7 +113,7 @@ export default async function SmartMoneyPage() {
                 </div>
               </article>
             </Tilt>
-          </Reveal>
+          </div>
         ))}
       </div>
     </>

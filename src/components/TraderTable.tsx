@@ -9,7 +9,7 @@ export function TraderTable({ rows, sort, skip = 0 }: { rows: Trader[]; sort: "P
   const max = Math.max(...rows.map((r) => Math.abs(sort === "PNL" ? r.pnl : r.volume)), 1);
   return (
     <div className="glass overflow-hidden rounded-[28px]">
-      <div className="grid grid-cols-[52px_1fr_minmax(120px,220px)_120px] gap-4 border-b hairline px-6 py-3.5 text-[11.5px] uppercase tracking-[0.16em] text-mute max-md:grid-cols-[40px_1fr_110px]">
+      <div className="grid grid-cols-[52px_1fr_minmax(120px,220px)_120px] gap-4 border-b hairline px-6 py-3.5 text-[13px] text-mute max-md:grid-cols-[40px_1fr_110px]">
         <span>Rank</span>
         <span>Trader</span>
         <span className="max-md:hidden">{sort === "PNL" ? "Profit" : "Volume"}</span>
@@ -57,7 +57,7 @@ export function FlowTable({ rows }: { rows: FlowRow[] }) {
   if (!rows.length) return <Empty msg="No $1K+ bets in this window yet." />;
   return (
     <div className="glass overflow-hidden rounded-[28px]">
-      <div className="grid grid-cols-[48px_1fr_120px_120px] gap-3 border-b hairline px-6 py-3.5 text-[11.5px] uppercase tracking-[0.16em] text-mute max-sm:grid-cols-[40px_1fr_110px]">
+      <div className="grid grid-cols-[48px_1fr_120px_120px] gap-3 border-b hairline px-6 py-3.5 text-[13px] text-mute max-sm:grid-cols-[40px_1fr_110px]">
         <span>#</span>
         <span>Trader · biggest bet</span>
         <span className="text-right text-bone">Money in</span>

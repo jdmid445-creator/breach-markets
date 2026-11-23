@@ -106,7 +106,7 @@ export function BubblePool({ trades, height = 420 }: { trades: Trade[]; height?:
               willChange: "transform",
               background: buy ? "radial-gradient(circle at 35% 30%, rgba(168,255,244,.55), rgba(116,255,237,.22) 45%, rgba(116,255,237,.08) 75%)" : "rgba(116,255,237,.03)",
               border: buy ? "none" : "1.2px solid rgba(116,255,237,.45)",
-              boxShadow: big ? "0 0 0 2px #fe81d1, 0 0 34px rgba(254,129,209,.45)" : buy ? "inset 0 0 0 1px rgba(168,255,244,.55), 0 0 24px rgba(116,255,237,.18)" : "none",
+              boxShadow: big ? "0 0 0 2px #fe81d1" : buy ? "inset 0 0 0 1px rgba(168,255,244,.55)" : "none",
             }}
             aria-label={`${t.name} ${buy ? "bought" : "sold"} ${usd(t.usd)} of ${t.outcome} on ${t.title}`}
           >

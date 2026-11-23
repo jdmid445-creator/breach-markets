@@ -4,7 +4,7 @@ import { positions, profile, standing, userTrades, short, displayName, type Peri
 import { usd, cents, ago, pmMarket, pmProfile } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
-import { CountUp, Reveal, Tilt } from "@/components/fx";
+import { CountUp, Tilt } from "@/components/fx";
 import { INTRO } from "@/lib/media";
 import { TextReveal } from "@/components/unlumen/text-reveal";
 
@@ -63,15 +63,15 @@ export default async function TraderPage({ params }: { params: Promise<{ address
           <div className="min-w-0 flex-1">
             <p className="flex flex-wrap items-center gap-2 text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">
               <span className="h-px w-8 bg-aqua/60" /> Whale profile
-              {best?.rankPnl && (
-                <span className="ml-2 rounded-full border border-aqua/40 px-2.5 py-0.5 text-[11px] normal-case tracking-normal">
-                  Top #{best.rankPnl.toLocaleString()} · {PERIODS.find((p) => p.id === best.period)!.label}
-                </span>
-              )}
             </p>
             <TextReveal as="h1" text={name} splitBy="characters" staggerDelay={0.03} className="display mt-4 truncate text-[clamp(40px,6.4vw,96px)] !leading-[0.95]" />
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13.5px] text-mute">
-              <span className="num rounded-full border border-line px-3 py-1">{short(address)}</span>
+              {best?.rankPnl && (
+                <span className="text-bone">
+                  Ranked <b className="num text-aqua">#{best.rankPnl.toLocaleString()}</b> on {PERIODS.find((p) => p.id === best.period)!.label} profit
+                </span>
+              )}
+              <span className="num">{short(address)}</span>
               {prof?.x && (
                 <a href={`https://x.com/${prof.x}`} target="_blank" rel="noreferrer" className="hover:text-bone">
                   @{prof.x}
@@ -86,15 +86,15 @@ export default async function TraderPage({ params }: { params: Promise<{ address
       </section>
 
       <div className="mx-auto max-w-[1240px] px-5">
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           {PERIODS.map((p, i) => {
             const s = stands[i];
             return (
-              <Reveal key={p.id} delay={i * 80}>
-                <Tilt className="group rounded-[24px]">
-                  <div className="glass rounded-[24px] px-6 py-6">
-                    <div className="text-[11.5px] uppercase tracking-[0.16em] text-mute">{p.label} profit</div>
-                    <div className={`num mt-3 text-[30px] font-semibold ${!s ? "text-mute" : s.pnl >= 0 ? "text-up" : "text-down"}`}>
+              <div key={p.id} className={p.id === "all" ? "col-span-2" : ""}>
+                <Tilt className="group h-full rounded-[24px]">
+                  <div className={`h-full rounded-[24px] px-6 py-6 ${p.id === "all" ? "bg-aqua text-ink" : "glass"}`}>
+                    <div className={`text-[13px] ${p.id === "all" ? "text-ink/70" : "text-mute"}`}>{p.label} profit</div>
+                    <div className={`num mt-3 font-semibold ${p.id === "all" ? "text-[44px]" : "text-[30px]"} ${p.id === "all" ? "" : !s ? "text-mute" : s.pnl >= 0 ? "text-up" : "text-down"}`}>
                       {s ? (
                         <>
                           {s.pnl >= 0 ? "+" : "−"}
@@ -104,12 +104,12 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                         "—"
                       )}
                     </div>
-                    <div className="num mt-2 text-[12.5px] text-mute">
-                      {s?.rankPnl ? <span className="text-bone">#{s.rankPnl.toLocaleString()}</span> : "Unranked"} · {s ? usd(s.volume) : "—"} vol
+                    <div className={`num mt-2 text-[12.5px] ${p.id === "all" ? "text-ink/70" : "text-mute"}`}>
+                      {s?.rankPnl ? <span className={p.id === "all" ? "font-semibold text-ink" : "text-bone"}>#{s.rankPnl.toLocaleString()}</span> : "Unranked"} · {s ? usd(s.volume) : "—"} vol
                     </div>
                   </div>
                 </Tilt>
-              </Reveal>
+              </div>
             );
           })}
         </div>
@@ -127,9 +127,9 @@ export default async function TraderPage({ params }: { params: Promise<{ address
         </div>
 
         {mixRows.length > 0 && (
-          <Reveal delay={120} className="mt-4">
+          <div className="mt-4">
             <div className="glass rounded-[24px] px-6 py-5">
-              <div className="text-[11.5px] uppercase tracking-[0.16em] text-mute">Where they play</div>
+              <div className="text-[13px] text-mute">Where they play</div>
               <div className="mt-4 flex h-3 gap-1 overflow-hidden rounded-full">
                 {mixRows.map(([k, v], i) => (
                   <span key={k} className="bar-in rounded-full" style={{ width: `${(v / mixTotal) * 100}%`, background: MIX[i], animationDelay: `${i * 120}ms` }} />
@@ -144,20 +144,20 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                 ))}
               </div>
             </div>
-          </Reveal>
+          </div>
         )}
 
         <div className="mt-20 grid gap-12 lg:grid-cols-2">
           <section>
-            <Reveal>
+            <div>
               <h2 className="display text-[clamp(34px,4vw,52px)]">
                 Holding <b>now</b>
               </h2>
-            </Reveal>
+            </div>
             <div className="mt-6 grid gap-3">
               {pos.length === 0 && <div className="glass rounded-[24px] px-6 py-12 text-center text-mute">No open positions right now.</div>}
               {pos.map((p, i) => (
-                <div key={`${p.conditionId}-${p.outcome}`} className="row-in glass group rounded-[22px] px-5 py-4 transition-colors hover:border-aqua/40" style={{ animationDelay: `${i * 50}ms` }}>
+                <div key={`${p.conditionId}-${p.outcome}`} className="row-in glass group rounded-[22px] px-5 py-4" style={{ animationDelay: `${i * 50}ms` }}>
                   <div className="flex items-start justify-between gap-4">
                     <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="min-w-0 text-[14.5px] font-medium leading-snug group-hover:text-aqua">
                       {p.title}
@@ -181,11 +181,11 @@ export default async function TraderPage({ params }: { params: Promise<{ address
           </section>
 
           <section>
-            <Reveal>
+            <div>
               <h2 className="display text-[clamp(34px,4vw,52px)]">
                 Recent <b>moves</b>
               </h2>
-            </Reveal>
+            </div>
             <ol className="relative mt-6 border-l border-line pl-6">
               {trades.length === 0 && <li className="glass rounded-[24px] px-6 py-12 text-center text-mute">No recent trades.</li>}
               {trades.slice(0, 25).map((t, i) => (
@@ -214,14 +214,14 @@ export default async function TraderPage({ params }: { params: Promise<{ address
   );
 }
 
-function Stat({ label, value, sub, tone, delay }: { label: string; value: React.ReactNode; sub?: string; tone?: "up" | "down"; delay: number }) {
+function Stat({ label, value, sub, tone }: { label: string; value: React.ReactNode; sub?: string; tone?: "up" | "down"; delay?: number }) {
   return (
-    <Reveal delay={delay}>
+    <div>
       <div className="glass rounded-[24px] px-6 py-5">
-        <div className="text-[11.5px] uppercase tracking-[0.16em] text-mute">{label}</div>
+        <div className="text-[13px] text-mute">{label}</div>
         <div className={`num mt-2.5 text-[26px] font-semibold ${tone === "up" ? "text-up" : tone === "down" ? "text-down" : ""}`}>{value}</div>
         {sub && <div className="mt-1 truncate text-[12.5px] text-mute">{sub}</div>}
       </div>
-    </Reveal>
+    </div>
   );
 }

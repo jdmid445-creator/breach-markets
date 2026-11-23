@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Trader } from "@/lib/pm";
 import { Avatar } from "./Avatar";
-import { CountUp, Reveal, Tilt } from "./fx";
+import { CountUp, Tilt } from "./fx";
 
 /** Top three traders as tilting cards, the leader raised in the middle. */
 export function Podium({ rows }: { rows: Trader[] }) {
@@ -14,13 +14,13 @@ export function Podium({ rows }: { rows: Trader[] }) {
       {order.map((t, i) => {
         const first = place[i] === 1;
         return (
-          <Reveal key={t.address} delay={first ? 0 : 150 + i * 60}>
+          <div key={t.address}>
             <Tilt className="group rounded-[28px]">
               <Link
                 href={`/trader/${t.address}`}
                 className={`relative block overflow-hidden rounded-[28px] border px-6 text-center ${
                   first
-                    ? "border-aqua/40 bg-[radial-gradient(circle_at_50%_0%,rgba(116,255,237,.18),rgba(16,23,58,.9)_60%)] pb-9 pt-10 shadow-[0_30px_80px_-30px_rgba(116,255,237,.35)]"
+                    ? "border-line bg-charcoal pb-9 pt-10"
                     : "border-line bg-coal/80 pb-7 pt-8"
                 }`}
               >
@@ -39,7 +39,7 @@ export function Podium({ rows }: { rows: Trader[] }) {
                 </div>
               </Link>
             </Tilt>
-          </Reveal>
+          </div>
         );
       })}
     </div>
