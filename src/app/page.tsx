@@ -42,12 +42,11 @@ export default async function Home() {
     <>
       <ScrollIntro />
       {/* seam: the intro's night water melts straight into the desk's water, no band */}
-      <div aria-hidden className="pointer-events-none relative z-0 -mb-56 h-56 bg-[linear-gradient(180deg,#0a0f26_0%,rgba(10,15,38,.6)_45%,rgba(10,15,38,0)_100%)]" />
+      <div aria-hidden className="pointer-events-none relative z-10 -mb-64 -mt-28 h-[23rem] bg-[linear-gradient(180deg,rgba(10,15,38,0)_0%,#0a0f26_30%,#0a0f26_42%,rgba(10,15,38,.55)_68%,rgba(10,15,38,0)_100%)]" />
 
-      <div className="relative mx-auto max-w-[1360px] px-5 pt-6 md:px-8 md:pt-10">
+      <div className="relative z-20 mx-auto max-w-[1360px] px-5 pt-6 md:px-8 md:pt-10">
         <div className="relative">
           <SplitTitle as="h2" text="Top traders today" hiLast className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
-          <HeroTail3D className="pointer-events-none -mb-6 -mt-2 mx-auto h-[230px] w-[260px] lg:hidden" />
         </div>
         <div className="mt-6">
           <LeaderHub initial={today ?? []} titled={false} aside={<HeroTail3D className="h-[260px] w-[300px]" />} />
