@@ -45,7 +45,7 @@ export default async function Home() {
 
       <div className="relative z-20 mx-auto max-w-[1360px] px-5 pt-6 md:px-8 md:pt-10">
         <div className="relative">
-          <SplitTitle as="h2" text="Top traders today" hiLast className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
+          <SplitTitle as="h2" text="Top traders today" hiLast spot className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
         </div>
         <div className="mt-6">
           <LeaderHub initial={today ?? []} titled={false} />

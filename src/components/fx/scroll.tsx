@@ -24,7 +24,7 @@ export function BigTitle({ text, hi = [], className = "", as = "h2" }: { text: s
   const Tag = motion[as];
   const words = text.split(" ");
   return (
-    <Tag ref={ref} aria-label={text} className={`mega ${className}`}>
+    <Tag ref={ref} aria-label={text} data-whale-spot className={`mega ${className}`}>
       {words.map((w, i) => {
         const dir = i % 2 === 0 ? -1 : 1;
         return (
