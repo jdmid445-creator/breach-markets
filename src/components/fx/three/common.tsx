@@ -48,7 +48,7 @@ export function LazyCanvas({ className = "", style, children, ...props }: Canvas
   return (
     <div ref={box} className={className} style={style}>
       {mounted && gl && (
-        <Canvas frameloop={visible ? "always" : "never"} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }} style={{ touchAction: "pan-y" }} {...props}>
+        <Canvas frameloop={visible ? "always" : "never"} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true, localClippingEnabled: true }} style={{ touchAction: "pan-y" }} {...props}>
           {children}
         </Canvas>
       )}

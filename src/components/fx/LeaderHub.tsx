@@ -142,7 +142,6 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
 
         {top.length >= 3 && (
           <Podium3D
-            key={key}
             className="hidden h-[470px] md:block"
             signed={!single && sort === "PNL"}
             rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: single ? `${t.trades ?? 0} ${t.trades === 1 ? "bet" : "bets"} today` : sort === "PNL" ? "profit today" : "traded today" }))}
@@ -150,7 +149,6 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
         )}
         {top.length >= 3 && (
           <Podium3D
-            key={`m-${key}`}
             labels={false}
             className="-mx-5 h-[260px] md:hidden"
             rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: "" }))}
