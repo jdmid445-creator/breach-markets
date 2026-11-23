@@ -21,6 +21,7 @@
   --color-stone-hi: #8dbbe0;
   --color-scarlet: #eb2f33;
   --color-scarlet-fg: #ff6b6e;
+  --color-scarlet-deep: #cc2629; /* rank chip fill: white label at 5.4:1 */
 
   --font-display: "Archivo Variable", "Helvetica Neue", sans-serif;
   --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;

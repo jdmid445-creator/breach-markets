@@ -9,12 +9,3 @@ export function LogoMark({ size = 28, className = "" }: { size?: number; classNa
     </svg>
   );
 }
-
-export function Logo() {
-  return (
-    <span className="flex items-center gap-2.5">
-      <LogoMark size={32} />
-      <span className="display text-[22px] !font-[500] tracking-[0.08em]">Breach</span>
-    </span>
-  );
-}

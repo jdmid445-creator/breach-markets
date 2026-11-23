@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "ibm plex sans",
+        "createdAt": "2026-11-23T10:42:05.734Z",
+        "reason": "Claude: scoped to #intro only to keep the owner-pinned intro film unchanged (PRODUCT.md brand commitment)"
+      }
+    ]
+  }
+}

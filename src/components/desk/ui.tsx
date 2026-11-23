@@ -69,7 +69,7 @@ export function RankChip({ rank, size = "sm" }: { rank: number; size?: "sm" | "m
     <span
       aria-label={`Rank ${rank}`}
       className={`fig inline-flex shrink-0 items-center rounded-[5px] font-bold leading-none ${size === "md" ? "h-6 px-2 text-[13px]" : "h-[20px] px-1.5 text-[12px]"} ${
-        elite ? "bg-scarlet text-white" : "border border-hair-2 text-stone-hi"
+        elite ? "bg-scarlet-deep text-white" : "border border-hair-2 text-stone-hi"
       }`}
     >
       #{rank.toLocaleString()}
@@ -106,7 +106,7 @@ export function Verified() {
   );
 }
 
-/** Up/down coloured signed money. */
+/** Signed money: profit in stone, loss in mist; the sign carries the direction. */
 export function Pnl({ value, children, className = "" }: { value: number; children: React.ReactNode; className?: string }) {
   return <span className={`fig font-semibold ${value >= 0 ? "text-stone-hi" : "text-mist"} ${className}`}>{children}</span>;
 }
