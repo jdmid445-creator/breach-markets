@@ -8,7 +8,7 @@ import { usd, cents, ago, tier, pmMarket } from "@/lib/format";
 import { bucketLabel, isSport } from "@/lib/sports";
 import { useWhales, useNow } from "@/lib/useWhales";
 import { Sea } from "@/components/fx/Sea";
-import { MarketIcon, RankChip, Empty, Panel, Side } from "./ui";
+import { MarketIcon, RankChip, Empty, Side } from "./ui";
 import { Counter } from "@/components/fx/motion";
 import { ScrollZoom } from "@/components/fx/scroll";
 

@@ -378,6 +378,11 @@ function Scene({ trades, fresh, onPick, hover, setHover, now }: { trades: Trade[
             </Billboard>
           );
         })}
+      {labels.map((l) => (
+        <Text key={l.id} font="/fonts/hanken-600.woff" position={[l.x, 0.05, l.z]} rotation={[-Math.PI / 2, 0, l.rot]} fontSize={0.5} color="#8dbbe0" anchorX="center" anchorY="middle" fillOpacity={0.9}>
+          {l.label}
+        </Text>
+      ))}
       {/* market boundaries */}
       {sectors.map((sc) => (
         <mesh key={`b-${sc.id}`} position={[Math.cos(sc.a0) * ((R_MIN + 10) / 2), 0.03, Math.sin(sc.a0) * ((R_MIN + 10) / 2)]} rotation={[-Math.PI / 2, 0, -sc.a0]}>
