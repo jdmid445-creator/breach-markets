@@ -109,7 +109,7 @@ export function SonarCursor() {
   );
 }
 
-/** Word-by-word rise for big display headlines. */
+/** Word-by-word rise for big t-head headlines. */
 export function Headline({ lines, className = "" }: { lines: { text: string; accent?: boolean }[][]; className?: string }) {
   let i = 0;
   return (
@@ -181,7 +181,7 @@ export function Tilt({ children, className = "" }: { children: React.ReactNode; 
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 [.group:hover_&]:opacity-100"
-        style={{ background: "radial-gradient(300px circle at var(--gx,50%) var(--gy,50%), rgba(116,255,237,.14), transparent 60%)" }}
+        style={{ background: "radial-gradient(300px circle at var(--gx,50%) var(--gy,50%), rgba(205,129,23,.14), transparent 60%)" }}
       />
     </div>
   );

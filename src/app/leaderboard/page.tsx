@@ -57,7 +57,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     board = (
       <>
         {podium && (
-          <div className="mb-10">
+          <div className="mb-6">
             <Podium rows={rows} />
           </div>
         )}
@@ -76,28 +76,27 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     <>
       <PageHero kicker="Leaderboards" title={headline} sub={note} compact>
         <div className="flex flex-col gap-3">
-          <Segmented id="cat" items={CATEGORIES.map((c) => ({ href: href({ cat: c.id, sport: undefined }), label: c.label, active: c.id === cat }))} />
+          <Segmented id="cat" label="market" items={CATEGORIES.map((c) => ({ href: href({ cat: c.id, sport: undefined }), label: c.label, active: c.id === cat }))} />
           {cat === "sports" && (
             <Segmented
               id="sport"
-              size="sm"
-              tone="bone"
+              label="sport"
               items={[{ href: href({ sport: undefined }), label: "All sports", active: !sport }, ...SPORTS.map((s) => ({ href: href({ sport: s.id }), label: s.label, active: s.id === sport }))]}
             />
           )}
           <div className="flex flex-wrap gap-3">
-            <Segmented id="win" items={WINDOWS.map((w) => ({ href: href({ w: w.id }), label: w.label, active: w.id === win }))} />
+            <Segmented id="win" label="window" items={WINDOWS.map((w) => ({ href: href({ w: w.id }), label: w.label, active: w.id === win }))} />
             {!flowMode && (
               <Segmented
                 id="sort"
-                tone="bone"
+                label="rank by"
                 items={(["PNL", "VOLUME"] as const).map((x) => ({ href: href({ sort: x }), label: x === "PNL" ? "Profit" : "Volume", active: x === sort }))}
               />
             )}
           </div>
         </div>
       </PageHero>
-      <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1240px] px-5">
+      <div key={`${cat}-${win}-${sort}-${sport ?? ""}`} className="mx-auto max-w-[1440px] px-5 pt-8">
         {board}
       </div>
     </>

@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-const HUES = ["#1f6f73", "#1a2250", "#2b3a7a", "#171f44", "#3b8e8f"];
+const HUES = ["#292f08", "#3a3f1a", "#4f5530", "#5c4a1c", "#2b2d22"];
 
 export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; size?: number }) {
   if (src) {
@@ -10,7 +10,7 @@ export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; s
         width={size}
         height={size}
         loading="lazy"
-        className="block shrink-0 rounded-full object-cover ring-1 ring-line"
+        className="block shrink-0 rounded-full object-cover ring-1 ring-t-line"
         style={{ width: size, height: size }}
       />
     );
@@ -22,7 +22,7 @@ export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; s
   return (
     <span
       aria-hidden
-      className="block shrink-0 rounded-full ring-1 ring-line"
+      className="block shrink-0 rounded-full ring-1 ring-t-line"
       style={{ width: size, height: size, background: `linear-gradient(135deg, ${a}, ${b})` }}
     />
   );

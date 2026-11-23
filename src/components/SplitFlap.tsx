@@ -35,7 +35,7 @@ export function SplitFlap({ value, className = "", speed = 38 }: { value: string
         <span
           key={i}
           aria-hidden
-          className={`flap relative inline-block min-w-[0.62em] rounded-[3px] bg-ink/70 px-[0.08em] text-center ring-1 ring-white/5 ${flipping[i] ? "flap-on" : ""}`}
+          className={`flap relative inline-block min-w-[0.62em] rounded-[2px] bg-t-olive px-[0.08em] text-center ${flipping[i] ? "flap-on" : ""}`}
         >
           {c}
         </span>

@@ -18,20 +18,31 @@
   --color-up: #74ffed;
   --color-down: #ff8a7a;
 
+  /* Terminal desk (everything after the intro): Ink Black / Olive / Amber Gold */
+  --color-t-bg: #0e0e10;
+  --color-t-panel: #141510;
+  --color-t-olive: #292f08;
+  --color-t-line: #2b2d22;
+  --color-t-text: #e8e4d6;
+  --color-t-dim: #a29d86;
+  --color-t-amber: #cd8117;
+  --color-t-up: #b4cc5e;
+  --color-t-down: #e0664a;
+
   --font-display: "Archivo Variable", "Helvetica Neue", sans-serif;
   --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 }
 
-html { background: var(--color-ink); color-scheme: dark; }
+html { background: var(--color-t-bg); color-scheme: dark; }
 body {
-  background: var(--color-ink);
-  color: var(--color-bone);
-  font-family: var(--font-sans);
+  background: var(--color-t-bg);
+  color: var(--color-t-text);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: var(--color-aqua); color: var(--color-ink); }
+
 
 /* Film grain over everything — keeps flat charcoal from feeling digital */
 body::after {
@@ -147,3 +158,18 @@ body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: trans
 @keyframes flap { 0% { transform: rotateX(0); } 50% { transform: rotateX(-80deg); } 100% { transform: rotateX(0); } }
 .flap-on { animation: flap .12s linear infinite; transform-origin: 50% 50%; }
 @media (prefers-reduced-motion: reduce) { .flap-on { animation: none; } }
+
+/* ---------- Terminal desk ---------- */
+.t-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.t-head { font-family: var(--font-display); font-stretch: 125%; font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; line-height: .9; }
+.t-scan { background-image: repeating-linear-gradient(0deg, rgba(232,228,214,.025) 0 1px, transparent 1px 3px); }
+.t-row:hover { background: rgba(205,129,23,.06); }
+.t-row:hover .t-cross { opacity: 1; }
+@keyframes t-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.t-type { animation: t-type .7s steps(28, end) both; }
+@keyframes t-blink { 50% { opacity: .25; } }
+.t-blink { animation: t-blink 1.1s steps(1) infinite; }
+@keyframes sweep { to { transform: rotate(360deg); } }
+.t-sweep { animation: sweep 6s linear infinite; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) { .t-type, .t-blink, .t-sweep { animation: none; } }
+::selection { background: var(--color-t-amber); color: var(--color-t-bg); }
