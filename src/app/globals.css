@@ -2,19 +2,23 @@
 
 /* Palette: Charcoal Black / Royal Blue / Tangerine Orange (accent, used sparingly) */
 @theme {
-  --color-ink: #0f1015;
-  --color-coal: #16171e;
-  --color-charcoal: #21232e;
-  --color-line: #2b2e3b;
-  --color-mute: #8b8e9c;
-  --color-bone: #edebe6;
-  --color-royal: #105bff;
-  --color-royal-soft: #6f98ff;
-  --color-tang: #fe8500;
-  --color-up: #4fd39a;
-  --color-down: #ff6b5f;
+  /* "Deep Water": Midnight Abyss + Aqua Jade, Baby Pink accent (blue whales only) */
+  --color-ink: #0a0f26;
+  --color-coal: #10173a;
+  --color-charcoal: #1a2250;
+  --color-line: #252f5e;
+  --color-mute: #8e98c0;
+  --color-bone: #eaf6f5;
+  --color-abyss: #171f44;
+  --color-royal: #74ffed;
+  --color-royal-soft: #a8fff4;
+  --color-aqua: #74ffed;
+  --color-tang: #fe81d1;
+  --color-pink: #fe81d1;
+  --color-up: #74ffed;
+  --color-down: #ff8a7a;
 
-  --font-display: "Anton", "Impact", sans-serif;
+  --font-display: "Archivo Variable", "Helvetica Neue", sans-serif;
   --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 }
@@ -27,7 +31,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: var(--color-royal); color: white; }
+::selection { background: var(--color-aqua); color: var(--color-ink); }
 
 /* Film grain over everything — keeps flat charcoal from feeling digital */
 body::after {
@@ -41,29 +45,30 @@ body::after {
 }
 
 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.display { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.005em; line-height: 0.88; }
+.display { font-family: var(--font-display); font-stretch: 125%; font-weight: 300; text-transform: uppercase; letter-spacing: -0.015em; line-height: 0.92; }
+.display b, .display strong { font-weight: 600; }
 
 /* Sonar / contour texture for hero sections */
 .contours {
   background-image:
-    radial-gradient(circle at 78% 30%, transparent 0 60px, rgba(16,91,255,.22) 61px 62px, transparent 63px 120px, rgba(16,91,255,.16) 121px 122px, transparent 123px 190px, rgba(16,91,255,.11) 191px 192px, transparent 193px 270px, rgba(16,91,255,.08) 271px 272px, transparent 273px 360px, rgba(16,91,255,.05) 361px 362px, transparent 363px);
+    radial-gradient(circle at 78% 30%, transparent 0 60px, rgba(116,255,237,.22) 61px 62px, transparent 63px 120px, rgba(116,255,237,.16) 121px 122px, transparent 123px 190px, rgba(116,255,237,.11) 191px 192px, transparent 193px 270px, rgba(116,255,237,.08) 271px 272px, transparent 273px 360px, rgba(116,255,237,.05) 361px 362px, transparent 363px);
 }
 
 .hairline { border-color: var(--color-line); }
 
 /* Whale tiers */
-.tier-whale { color: var(--color-royal-soft); background: rgba(16,91,255,.12); }
-.tier-orca { color: #bcd0ff; background: rgba(16,91,255,.22); }
+.tier-whale { color: var(--color-aqua); background: rgba(116,255,237,.08); }
+.tier-orca { color: var(--color-bone); background: rgba(116,255,237,.22); }
 .tier-hump { color: var(--color-ink); background: var(--color-royal-soft); }
 .tier-blue { color: var(--color-ink); background: var(--color-tang); }
 
 @keyframes surface {
-  from { opacity: 0; transform: translateY(10px); background-color: rgba(16,91,255,.18); }
+  from { opacity: 0; transform: translateY(10px); background-color: rgba(116,255,237,.18); }
   to { opacity: 1; transform: none; background-color: transparent; }
 }
 .surface-in { animation: surface .9s cubic-bezier(.2,.8,.2,1) both; }
 
-@keyframes ping-dot { 0% { box-shadow: 0 0 0 0 rgba(254,133,0,.6);} 100% { box-shadow: 0 0 0 8px rgba(254,133,0,0);} }
+@keyframes ping-dot { 0% { box-shadow: 0 0 0 0 rgba(254,129,209,.6);} 100% { box-shadow: 0 0 0 8px rgba(254,129,209,0);} }
 .live-dot { width: 7px; height: 7px; border-radius: 99px; background: var(--color-tang); animation: ping-dot 1.6s infinite; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -76,7 +81,7 @@ body::after {
 
 /* Click sonar ping */
 @keyframes sonar { from { transform: translate(-50%,-50%) scale(0); opacity: .9; } to { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
-.sonar-ping { position: absolute; width: 520px; height: 520px; border-radius: 999px; border: 1.5px solid rgba(111,152,255,.7); animation: sonar 1.6s cubic-bezier(.1,.6,.3,1) forwards; }
+.sonar-ping { position: absolute; width: 520px; height: 520px; border-radius: 999px; border: 1.5px solid rgba(116,255,237,.7); animation: sonar 1.6s cubic-bezier(.1,.6,.3,1) forwards; }
 
 /* Slow drift on the hero contours */
 @keyframes drift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-3%,2%,0) scale(1.06); } }
@@ -94,3 +99,21 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .word-rise, .sonar-ping, .drift, .marquee { animation: none; }
 }
+
+/* Light "studio" scenes between deep-water scenes */
+.scene-light { background: var(--color-bone); color: var(--color-abyss); }
+.scene-light .text-mute { color: #56608a; }
+.scene-light .hairline { border-color: #cfdedd; }
+
+/* Caustic light ripple for underwater scenes */
+@keyframes caustic { 0% { background-position: 0 0, 0 0; } 100% { background-position: 400px 200px, -300px 160px; } }
+.caustics {
+  background-image:
+    radial-gradient(120px 40px at 20% 30%, rgba(116,255,237,.10), transparent 70%),
+    radial-gradient(160px 50px at 70% 60%, rgba(116,255,237,.07), transparent 70%);
+  background-size: 400px 240px, 520px 300px;
+  animation: caustic 14s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .caustics { animation: none; } }
+
+@keyframes dive { 0% { transform: translateY(-100%); } 100% { transform: translateY(250%); } }

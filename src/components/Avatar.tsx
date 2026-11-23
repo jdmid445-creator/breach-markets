@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-const HUES = ["#105BFF", "#2a3350", "#3b4a7a", "#1d2a55", "#5a6b9e"];
+const HUES = ["#1f6f73", "#1a2250", "#2b3a7a", "#171f44", "#3b8e8f"];
 
 export function Avatar({ src, seed, size = 32 }: { src?: string; seed: string; size?: number }) {
   if (src) {

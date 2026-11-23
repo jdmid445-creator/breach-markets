@@ -132,3 +132,57 @@ export function Headline({ lines, className = "" }: { lines: { text: string; acc
     </h1>
   );
 }
+
+/** Element that leans toward the cursor (magnetic), springs back on leave. */
+export function Magnetic({ children, strength = 0.35, className = "" }: { children: React.ReactNode; strength?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={ref}
+      className={`inline-block transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)] ${className}`}
+      onPointerMove={(e) => {
+        const el = ref.current!;
+        const r = el.getBoundingClientRect();
+        el.style.transitionDuration = "120ms";
+        el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * strength}px, ${(e.clientY - r.top - r.height / 2) * strength}px)`;
+      }}
+      onPointerLeave={() => {
+        const el = ref.current!;
+        el.style.transitionDuration = "500ms";
+        el.style.transform = "";
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** 3D tilt toward the pointer with a moving glare. */
+export function Tilt({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={ref}
+      className={`relative transition-transform duration-300 ease-out [transform-style:preserve-3d] ${className}`}
+      onPointerMove={(e) => {
+        const el = ref.current!;
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateX(${-y * 7}deg) rotateY(${x * 9}deg)`;
+        el.style.setProperty("--gx", `${(x + 0.5) * 100}%`);
+        el.style.setProperty("--gy", `${(y + 0.5) * 100}%`);
+      }}
+      onPointerLeave={() => {
+        ref.current!.style.transform = "";
+      }}
+    >
+      {children}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 [.group:hover_&]:opacity-100"
+        style={{ background: "radial-gradient(300px circle at var(--gx,50%) var(--gy,50%), rgba(116,255,237,.14), transparent 60%)" }}
+      />
+    </div>
+  );
+}

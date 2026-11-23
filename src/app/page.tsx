@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { bigTrades, leaderboard } from "@/lib/pm";
+import type { Trader, Trade } from "@/lib/pm";
 import { usd } from "@/lib/format";
 import { WhaleFeed } from "@/components/WhaleFeed";
 import { Avatar } from "@/components/Avatar";
-import { HeroMedia } from "@/components/HeroMedia";
-import type { Trader, Trade } from "@/lib/pm";
-import { Reveal, CountUp, SonarCursor, Headline } from "@/components/fx";
 import { BubblePool } from "@/components/BubblePool";
+import { ScrollIntro } from "@/components/ScrollIntro";
+import { Reveal, CountUp, Magnetic, Tilt } from "@/components/fx";
+import { TextReveal } from "@/components/unlumen/text-reveal";
 
 export const revalidate = 30;
 
@@ -18,142 +19,152 @@ export default async function Home() {
     leaderboard({ period: "week", category: "sports", sort: "PNL", limit: 5 }),
   ]);
   const trades = feed ?? [];
-  const since = Date.now() / 1000 - 86400;
-  const today = trades.filter((t) => t.ts >= since);
+  const moved = trades.reduce((s, t) => s + t.usd, 0);
   const biggest = [...trades].sort((a, b) => b.usd - a.usd)[0];
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b hairline">
-        <HeroMedia />
-        <SonarCursor />
-        <div className="relative mx-auto max-w-[1240px] px-5 pb-20 pt-20 sm:pt-28">
-          <p className="flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.18em] text-royal-soft">
-            <span className="live-dot" /> Polymarket whale tracker
-          </p>
-          <Headline
-            className="display mt-5 text-[clamp(64px,13vw,188px)]"
-            lines={[
-              [{ text: "See" }, { text: "the" }, { text: "whales" }],
-              [{ text: "before", accent: true }, { text: "the" }, { text: "market" }],
-            ]}
-          />
-          <p className="mt-7 max-w-[520px] text-[17px] leading-relaxed text-mute">
-            Every $10K+ bet the moment it lands. The sharpest traders ranked by category, sport and hour. And what the top wallets are holding right now.
-          </p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link href="/live" className="rounded-full bg-tang px-6 py-3 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-0.5">
-              Watch whales live
-            </Link>
-            <Link href="/leaderboard" className="rounded-full border hairline bg-coal/70 px-6 py-3 text-[15px] font-semibold backdrop-blur hover:border-bone">
-              Leaderboards
-            </Link>
-          </div>
-
-          <dl className="mt-16 grid max-w-[720px] grid-cols-3 gap-6 border-t hairline pt-6">
-            <Stat k="Latest whale bets" v={<CountUp value={trades.length} format="int" />} />
-            <Stat k="Moved in those bets" v={<CountUp value={today.reduce((s, t) => s + t.usd, 0)} format="usd" />} />
-            <Stat k="Biggest recent bet" v={biggest ? <CountUp value={biggest.usd} format="usd" /> : "—"} />
-          </dl>
-        </div>
-      </section>
+      <ScrollIntro
+        stats={[
+          { label: "Latest whale bets", value: String(trades.length) },
+          { label: "Money in them", value: usd(moved) },
+          { label: "Biggest one", value: biggest ? usd(biggest.usd) : "—" },
+        ]}
+      />
 
       <Tape trades={trades} />
 
-      {/* Pool */}
-      <section className="mx-auto max-w-[1240px] px-5 pt-20">
-        <Reveal>
-          <SectionHead kicker="The pool" title="Every bubble is a bet" href="/live" cta="Live feed" />
-        </Reveal>
-        <Reveal delay={120} className="mt-6">
-          <BubblePool trades={trades} height={460} />
-        </Reveal>
-      </section>
-
-      {/* Live tape */}
-      <section className="mx-auto max-w-[1240px] px-5 pt-20">
-        <Reveal>
-          <SectionHead kicker="Live" title="Surfacing now" href="/live" cta="Open full feed" />
-        </Reveal>
-        <Reveal delay={120} className="mt-6">
-          <WhaleFeed initial={trades} compact limit={8} />
-        </Reveal>
-      </section>
-
-      {/* Boards */}
-      <section className="mx-auto max-w-[1240px] px-5 pt-24">
-        <Reveal>
-          <SectionHead kicker="Leaderboards" title="Who’s printing" href="/leaderboard" cta="All boards" />
-        </Reveal>
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <Reveal delay={0}><MiniBoard title="Today, overall" rows={overall} href="/leaderboard?cat=overall&w=day" /></Reveal>
-          <Reveal delay={120}><MiniBoard title="This week, politics" rows={politics} href="/leaderboard?cat=politics&w=week" /></Reveal>
-          <Reveal delay={240}><MiniBoard title="This week, sports" rows={sports} href="/leaderboard?cat=sports&w=week" /></Reveal>
+      {/* Scene 1 (light studio): what Breach reads */}
+      <section className="scene-light">
+        <div className="mx-auto max-w-[1240px] px-5 py-28">
+          <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2b8f86]">Read the water</p>
+          <TextReveal
+            as="h2"
+            text="Polymarket shows you the odds. Breach shows you who’s moving them."
+            className="display mt-5 max-w-[1050px] text-[clamp(38px,5.6vw,80px)] !leading-[0.98]"
+            staggerDelay={0.045}
+          />
+          <div className="mt-16 grid gap-5 md:grid-cols-3">
+            {[
+              { k: "01", t: "Live whales", d: "Every $10K+ bet the second it lands, sized, tiered and filterable by sport, politics or crypto.", h: "/live", stat: <CountUp value={trades.length} format="int" />, sl: "bets in the latest pull" },
+              { k: "02", t: "Leaderboards", d: "Top traders by profit for 24H, 7D, 30D and all time, across 11 categories and 11 individual sports.", h: "/leaderboard", stat: <CountUp value={22} format="int" />, sl: "boards to dig through" },
+              { k: "03", t: "Smart money", d: "Markets where two or more of the month’s top 30 traders hold the same side.", h: "/smart-money", stat: <CountUp value={30} format="int" />, sl: "sharpest wallets tracked" },
+            ].map((c, i) => (
+              <Reveal key={c.k} delay={i * 120}>
+                <Tilt className="group rounded-3xl">
+                  <Link href={c.h} className="block rounded-3xl border border-[#cfdedd] bg-white/70 p-7 shadow-[0_20px_60px_-30px_rgba(23,31,68,.35)] backdrop-blur">
+                    <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.18em] text-[#56608a]">
+                      <span>{c.k}</span>
+                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                    </div>
+                    <h3 className="display mt-10 text-[28px] !font-[500]">{c.t}</h3>
+                    <p className="mt-3 text-[15px] leading-relaxed text-[#56608a]">{c.d}</p>
+                    <div className="mt-8 border-t border-[#cfdedd] pt-5">
+                      <div className="num text-[34px] font-semibold">{c.stat}</div>
+                      <div className="text-[12.5px] text-[#56608a]">{c.sl}</div>
+                    </div>
+                  </Link>
+                </Tilt>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Smart money teaser */}
-      <Reveal className="mx-auto max-w-[1240px] px-5 pt-24">
-        <Link
-          href="/smart-money"
-          className="group relative block overflow-hidden rounded-3xl border hairline bg-royal px-8 py-14 sm:px-14"
-        >
-          <div className="contours drift absolute -inset-[8%] opacity-60 mix-blend-screen" aria-hidden />
-          <p className="relative text-[13px] font-medium uppercase tracking-[0.18em] text-white/70">Smart money</p>
-          <h2 className="display relative mt-4 max-w-[900px] text-[clamp(44px,7vw,96px)] text-white">
-            When the top 30 stack the same side, you’ll know
-          </h2>
-          <span className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-bone transition-transform group-hover:translate-x-1">
-            See where the pod is swimming →
-          </span>
-        </Link>
-      </Reveal>
+      {/* Scene 2 (deep): the pool + live feed */}
+      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#eaf6f5_0%,#2a6f86_7%,#171f44_22%,#0a0f26_100%)] pt-40">
+        <div className="caustics pointer-events-none absolute inset-0 opacity-80" aria-hidden />
+        <div className="relative mx-auto max-w-[1240px] px-5">
+          <Reveal>
+            <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">The pool</p>
+            <h2 className="display mt-4 text-[clamp(44px,7vw,104px)]">
+              Every bubble is <b>a bet</b>
+            </h2>
+            <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-mute">
+              Size is dollars. Filled bubbles are buys, hollow ones are sells, and anything over $250K glows pink. Hover to read it, click to follow the wallet.
+            </p>
+          </Reveal>
+          <Reveal delay={150} className="mt-10">
+            <BubblePool trades={trades} height={500} />
+          </Reveal>
+
+          <div className="mt-28 flex items-end justify-between gap-4">
+            <Reveal>
+              <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">Live</p>
+              <h2 className="display mt-4 text-[clamp(40px,6vw,84px)]">Surfacing <b>now</b></h2>
+            </Reveal>
+            <Magnetic>
+              <Link href="/live" className="rounded-full border border-aqua/40 px-5 py-2.5 text-[14px] text-aqua hover:bg-aqua hover:text-ink">
+                Full feed →
+              </Link>
+            </Magnetic>
+          </div>
+          <Reveal delay={120} className="mt-8 pb-28">
+            <WhaleFeed initial={trades} compact limit={8} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Scene 3 (light): boards */}
+      <section className="scene-light">
+        <div className="mx-auto max-w-[1240px] px-5 py-28">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2b8f86]">Leaderboards</p>
+              <TextReveal as="h2" text="Who’s printing" className="display mt-4 text-[clamp(44px,7vw,104px)]" />
+            </div>
+            <Magnetic>
+              <Link href="/leaderboard" className="rounded-full bg-abyss px-5 py-2.5 text-[14px] font-semibold text-bone">
+                All boards →
+              </Link>
+            </Magnetic>
+          </div>
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            <Reveal delay={0}><MiniBoard title="Today · overall" rows={overall} href="/leaderboard?cat=overall&w=day" /></Reveal>
+            <Reveal delay={120}><MiniBoard title="This week · politics" rows={politics} href="/leaderboard?cat=politics&w=week" /></Reveal>
+            <Reveal delay={240}><MiniBoard title="This week · sports" rows={sports} href="/leaderboard?cat=sports&w=week" /></Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Scene 4: smart money */}
+      <section className="relative overflow-hidden bg-abyss">
+        <div className="caustics absolute inset-0 opacity-60" aria-hidden />
+        <div className="contours drift absolute -inset-[8%] opacity-70" aria-hidden />
+        <div className="relative mx-auto max-w-[1240px] px-5 py-32 text-center">
+          <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-aqua">Smart money</p>
+          <TextReveal
+            as="h2"
+            text="When the top 30 swim the same way, you’ll see it first"
+            className="display mx-auto mt-5 max-w-[1000px] text-[clamp(40px,6.4vw,92px)] !leading-[0.98]"
+          />
+          <Magnetic className="mt-12">
+            <Link href="/smart-money" className="inline-flex rounded-full bg-aqua px-8 py-4 text-[16px] font-semibold text-ink shadow-[0_0_60px_rgba(116,255,237,.35)]">
+              Follow the pod →
+            </Link>
+          </Magnetic>
+        </div>
+      </section>
     </>
-  );
-}
-
-function Stat({ k, v }: { k: string; v: React.ReactNode }) {
-  return (
-    <div>
-      <dt className="text-[12px] uppercase tracking-[0.14em] text-mute">{k}</dt>
-      <dd className="num mt-2 text-[clamp(20px,3vw,30px)] font-semibold">{v}</dd>
-    </div>
-  );
-}
-
-function SectionHead({ kicker, title, href, cta }: { kicker: string; title: string; href: string; cta: string }) {
-  return (
-    <div className="flex items-end justify-between gap-4">
-      <div>
-        <p className="text-[13px] font-medium uppercase tracking-[0.18em] text-royal-soft">{kicker}</p>
-        <h2 className="display mt-2 text-[clamp(40px,6vw,72px)]">{title}</h2>
-      </div>
-      <Link href={href} className="shrink-0 text-[14px] text-mute hover:text-bone">
-        {cta} →
-      </Link>
-    </div>
   );
 }
 
 function MiniBoard({ title, rows, href }: { title: string; rows: Trader[] | null; href: string }) {
   return (
-    <div className="rounded-2xl border hairline bg-coal">
-      <div className="flex items-center justify-between border-b hairline px-5 py-3.5">
+    <div className="overflow-hidden rounded-3xl border border-[#cfdedd] bg-white shadow-[0_20px_60px_-35px_rgba(23,31,68,.4)]">
+      <div className="flex items-center justify-between border-b border-[#e3ecec] px-6 py-4">
         <h3 className="font-semibold">{title}</h3>
-        <Link href={href} className="text-[13px] text-mute hover:text-bone">
-          Top 100 →
-        </Link>
+        <Link href={href} className="text-[13px] text-[#56608a] hover:text-abyss">Top 100 →</Link>
       </div>
       <ol>
-        {(rows ?? []).length === 0 && <li className="px-5 py-10 text-center text-[14px] text-mute">No data yet.</li>}
+        {(rows ?? []).length === 0 && <li className="px-6 py-10 text-center text-[14px] text-[#56608a]">No data yet.</li>}
         {(rows ?? []).map((t, i) => (
-          <li key={t.address} className="border-b hairline last:border-0">
-            <Link href={`/trader/${t.address}`} className="lift flex items-center gap-3 px-5 py-3 hover:bg-charcoal/60">
-              <span className={`num w-5 text-[14px] ${i === 0 ? "font-bold text-tang" : "text-mute"}`}>{i + 1}</span>
+          <li key={t.address} className="border-b border-[#eef3f3] last:border-0">
+            <Link href={`/trader/${t.address}`} className="lift flex items-center gap-3 px-6 py-3.5 hover:bg-[#f2f8f8]">
+              <span className={`num w-5 text-[14px] ${i === 0 ? "font-bold text-[#d94fae]" : "text-[#8a93b5]"}`}>{i + 1}</span>
               <Avatar src={t.image} seed={t.address} size={30} />
               <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{t.name}</span>
-              <span className={`num text-[14px] font-semibold ${t.pnl >= 0 ? "text-up" : "text-down"}`}>{usd(t.pnl, { sign: true })}</span>
+              <span className={`num text-[14px] font-semibold ${t.pnl >= 0 ? "text-[#1d8f80]" : "text-[#d4553f]"}`}>{usd(t.pnl, { sign: true })}</span>
             </Link>
           </li>
         ))}
@@ -168,7 +179,7 @@ function Tape({ trades }: { trades: Trade[] }) {
   const row = (k: string) => (
     <div key={k} className="flex shrink-0 items-center">
       {items.map((t) => (
-        <Link key={`${k}-${t.id}`} href={`/trader/${t.wallet}`} className="flex items-center gap-2 whitespace-nowrap px-6 text-[13.5px] hover:text-royal-soft">
+        <Link key={`${k}-${t.id}`} href={`/trader/${t.wallet}`} className="flex items-center gap-2 whitespace-nowrap px-6 text-[13.5px] hover:text-aqua">
           <span className={t.side === "BUY" ? "text-up" : "text-down"}>{t.side === "BUY" ? "▲" : "▼"}</span>
           <span className="num font-semibold">{usd(t.usd)}</span>
           <span className="text-mute">{t.outcome}</span>
@@ -178,7 +189,7 @@ function Tape({ trades }: { trades: Trade[] }) {
     </div>
   );
   return (
-    <div className="overflow-hidden border-b hairline bg-coal py-3.5" aria-label="Recent whale bets">
+    <div className="overflow-hidden border-y hairline bg-coal py-4" aria-label="Recent whale bets">
       <div className="marquee flex w-max">{row("a")}{row("b")}</div>
     </div>
   );

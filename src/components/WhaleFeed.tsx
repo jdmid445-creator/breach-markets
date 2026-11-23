@@ -183,7 +183,7 @@ function Seg<T extends string | number>({
           key={String(o.v)}
           onClick={() => onChange(o.v)}
           className={`rounded-full px-3 py-1.5 transition-colors ${
-            value === o.v ? "bg-royal text-white" : "text-mute hover:text-bone"
+            value === o.v ? "bg-aqua text-ink" : "text-mute hover:text-bone"
           }`}
         >
           {o.l}

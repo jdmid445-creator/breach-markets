@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@fontsource/anton/400.css";
+import "@fontsource-variable/archivo/wdth.css";
 import "@fontsource-variable/hanken-grotesk";
 import "@fontsource-variable/jetbrains-mono";
 import "./globals.css";

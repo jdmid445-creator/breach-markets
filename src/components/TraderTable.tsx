@@ -85,8 +85,8 @@ export function FlowTable({ rows }: { rows: FlowRow[] }) {
 function Check() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" aria-label="Verified" className="shrink-0">
-      <circle cx="8" cy="8" r="8" fill="#105BFF" />
-      <path d="M4.6 8.2 7 10.4 11.4 5.8" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8" cy="8" r="8" fill="#74FFED" />
+      <path d="M4.6 8.2 7 10.4 11.4 5.8" fill="none" stroke="#0a0f26" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

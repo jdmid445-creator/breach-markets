@@ -79,7 +79,7 @@ export default async function SmartMoneyPage() {
                 </div>
                 <span className="text-[13px] text-mute">
                   <span className="font-semibold text-bone">{a.whales.length} top traders</span> hold{" "}
-                  <span className="rounded bg-royal px-1.5 py-0.5 text-[12px] font-semibold text-white">{a.outcome}</span>
+                  <span className="rounded bg-aqua px-1.5 py-0.5 text-[12px] font-semibold text-ink">{a.outcome}</span>
                 </span>
               </div>
             </div>

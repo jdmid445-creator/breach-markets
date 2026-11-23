@@ -106,14 +106,14 @@ export default async function TraderPage({ params }: { params: Promise<{ address
             {mixRows.map(([k, v], i) => (
               <span
                 key={k}
-                style={{ width: `${(v / mixTotal) * 100}%`, background: ["#105BFF", "#6f98ff", "#3a4466", "#fe8500"][i] }}
+                style={{ width: `${(v / mixTotal) * 100}%`, background: ["#74FFED", "#3b8e8f", "#2b3a7a", "#fe81d1"][i] }}
               />
             ))}
           </div>
           <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
             {mixRows.map(([k, v], i) => (
               <span key={k} className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full" style={{ background: ["#105BFF", "#6f98ff", "#3a4466", "#fe8500"][i] }} />
+                <span className="h-2 w-2 rounded-full" style={{ background: ["#74FFED", "#3b8e8f", "#2b3a7a", "#fe81d1"][i] }} />
                 {k} <span className="num text-mute">{Math.round((v / mixTotal) * 100)}%</span>
               </span>
             ))}

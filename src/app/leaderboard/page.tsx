@@ -92,7 +92,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             <Link
               key={w.id}
               href={href({ w: w.id })}
-              className={`rounded-full px-3.5 py-1.5 ${w.id === win ? "bg-royal text-white" : "text-mute hover:text-bone"}`}
+              className={`rounded-full px-3.5 py-1.5 ${w.id === win ? "bg-aqua text-ink" : "text-mute hover:text-bone"}`}
             >
               {w.label}
             </Link>
