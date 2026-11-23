@@ -10,7 +10,6 @@ import { usd } from "@/lib/format";
 import { Avatar } from "@/components/Avatar";
 import { Verified } from "@/components/desk/ui";
 import { SplitTitle, Tilt, Counter, Magnetic, EASE } from "./motion";
-import { Podium3D } from "./three";
 
 type Row = Trader & { trades?: number };
 type Sort = "PNL" | "VOLUME";
@@ -22,7 +21,7 @@ const SPORT_TABS = [{ id: "all", label: "All sports" }, ...SPORTS.map((s) => ({ 
  * The first thing after the intro: pick a market (and a sport), pick profit or
  * volume, see the top 20 for the last 24 hours. Refreshes every minute.
  */
-export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?: boolean }) {
+export function LeaderHub({ initial, titled = true, aside }: { initial: Row[]; titled?: boolean; aside?: React.ReactNode }) {
   const reduce = useReducedMotion();
   const [cat, setCat] = useState<string>("overall");
   const [sport, setSport] = useState<string>("all");
@@ -88,15 +87,17 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
           >
             The 20 best Polymarket traders of the last 24 hours. Pick a market, then rank by profit or by how much they traded.
           </motion.p>
+          <p className="mt-3 flex items-center gap-2 text-[13px] text-faint" aria-live="polite">
+            <span className="live-dot" />
+            Live from Polymarket · {age === null ? "loading" : age < 5 ? "updated just now" : `updated ${age}s ago`}
+          </p>
         </div>
-        <p className="flex items-center gap-2 text-[13px] text-faint" aria-live="polite">
-          <span className="live-dot" />
-          Live from Polymarket · {age === null ? "loading" : age < 5 ? "updated just now" : `updated ${age}s ago`}
-        </p>
       </div>
 
+      {/* one tail breaching in the empty space beside the market picker (desktop) */}
+      {aside && <div className="pointer-events-none absolute -top-[30px] right-0 z-0 hidden lg:block">{aside}</div>}
       {/* market picker */}
-      <div className="mt-8 -mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
+      <div className="relative z-10 mt-8 -mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
         <Pills id="mkt" value={cat} onChange={(v) => (setCat(v), setSport("all"))} items={MARKETS.map((m) => ({ id: m.id, label: m.label }))} size="lg" />
       </div>
       <AnimatePresence initial={false}>
@@ -132,7 +133,7 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
             ]}
           />
         )}
-        <span className="text-[13px] text-faint">Last 24 hours</span>
+        <span className={`text-[13px] text-faint ${aside ? "lg:hidden" : ""}`}>Last 24 hours</span>
       </div>
 
       {/* the board */}
@@ -140,22 +141,8 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
         {loading && !entry && <Skeleton />}
         {entry && rows.length === 0 && <p className="py-20 text-center text-mist">No {marketLabel} traders on the board yet today.</p>}
 
-        {top.length >= 3 && (
-          <Podium3D
-            className="hidden h-[470px] md:block"
-            signed={!single && sort === "PNL"}
-            rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: single ? `${t.trades ?? 0} ${t.trades === 1 ? "bet" : "bets"} today` : sort === "PNL" ? "profit today" : "traded today" }))}
-          />
-        )}
-        {top.length >= 3 && (
-          <Podium3D
-            labels={false}
-            className="-mx-5 h-[260px] md:hidden"
-            rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: "" }))}
-          />
-        )}
         {top.length > 0 && (
-          <div className={`grid gap-4 md:grid-cols-3 ${top.length >= 3 ? "md:hidden" : ""}`}>
+          <div className="grid gap-4 md:grid-cols-3">
             <AnimatePresence mode="popLayout" initial={false}>
               {top.map((t, i) => (
                 <motion.div

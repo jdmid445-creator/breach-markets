@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring, useTransform, useMotionValueEvent, useReducedMotion } from "motion/react";
 import { INTRO } from "@/lib/media";
@@ -24,19 +24,47 @@ export function ScrollIntro() {
   // Clips play on their own (smooth on any connection); scroll only drives
   // the text, the crossfade and the reveal. Remote MP4s can't be scrubbed
   // frame-by-frame without stutter, so we don't tie currentTime to scroll.
+  //
+  // Phones (iOS in-app browsers especially) can refuse play() until the page
+  // has had a touch, and a rejected play() used to leave the clip frozen and
+  // rewound on every scroll tick. Now: rewind only when crossing into the
+  // breach, keep retrying play() while it's on screen, and unlock both clips
+  // on the first touch or scroll.
+  const past = useRef(false);
+  const kick = (v: HTMLVideoElement | null) => {
+    if (v && v.paused) v.play().catch(() => {});
+  };
+  useEffect(() => {
+    const unlock = () => {
+      kick(dive.current);
+      const b = breach.current;
+      if (b && b.paused) b.play().then(() => { if (!past.current) b.pause(); }).catch(() => {});
+    };
+    window.addEventListener("touchstart", unlock, { passive: true, once: true });
+    window.addEventListener("pointerdown", unlock, { once: true });
+    return () => {
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("pointerdown", unlock);
+    };
+  }, []);
   useMotionValueEvent(p, "change", (v) => {
     const d = dive.current;
     const b = breach.current;
     if (d) {
-      if (v < 0.66 && d.paused) d.play().catch(() => {});
-      if (v >= 0.66 && !d.paused) d.pause();
+      if (v < 0.66) kick(d);
+      else if (!d.paused) d.pause();
     }
     if (b) {
-      if (v > 0.5 && b.paused) {
-        b.currentTime = 0;
-        b.play().catch(() => {});
+      if (v > 0.5) {
+        if (!past.current) {
+          past.current = true;
+          b.currentTime = 0;
+        }
+        kick(b);
+      } else if (v < 0.45) {
+        past.current = false;
+        if (!b.paused) b.pause();
       }
-      if (v < 0.45 && !b.paused) b.pause();
     }
   });
 
@@ -80,6 +108,9 @@ export function ScrollIntro() {
           loop
           preload="auto"
           autoPlay={!!reduce}
+          onLoadedData={() => {
+            if (past.current) kick(breach.current);
+          }}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: reduce ? 1 : breachOpacity }}
         />

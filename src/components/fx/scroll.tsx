@@ -8,53 +8,53 @@ import {
   useVelocity,
   useMotionValue,
   useAnimationFrame,
+  useInView,
   useReducedMotion,
-  type MotionValue,
 } from "motion/react";
 
 /**
- * A huge section headline. Its words slide in from alternating sides and
- * settle as the section scrolls into place; words in `hi` take the highlight.
+ * A huge section headline. The moment it enters the screen its words slide
+ * in from alternating sides on their own clock (not tied to scroll speed),
+ * so it plays the same way on a flick or a slow scroll.
  */
 export function BigTitle({ text, hi = [], className = "", as = "h2" }: { text: string; hi?: string[]; className?: string; as?: "h1" | "h2" }) {
   const ref = useRef<HTMLHeadingElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "start 35%"] });
-  const p = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
+  const inView = useInView(ref, { once: true, amount: 0.2 });
   const Tag = motion[as];
   const words = text.split(" ");
   return (
     <Tag ref={ref} aria-label={text} className={`mega ${className}`}>
-      {words.map((w, i) => (
-        <Word key={i} p={p} i={i} reduce={!!reduce} hi={hi.includes(w.replace(/[^A-Za-z0-9$]/g, ""))}>
-          {w}
-        </Word>
-      ))}
+      {words.map((w, i) => {
+        const dir = i % 2 === 0 ? -1 : 1;
+        return (
+          <motion.span
+            key={i}
+            aria-hidden
+            className={`mr-[0.22em] inline-block ${hi.includes(w.replace(/[^A-Za-z0-9$]/g, "")) ? "hi-word" : ""}`}
+            initial={reduce ? false : { x: `${dir * 14}vw`, opacity: 0 }}
+            animate={inView ? { x: "0vw", opacity: 1 } : undefined}
+            transition={{ x: { type: "spring", stiffness: 90, damping: 18, mass: 0.9, delay: i * 0.06 }, opacity: { duration: 0.35, delay: i * 0.06 } }}
+          >
+            {w}
+          </motion.span>
+        );
+      })}
     </Tag>
   );
 }
-function Word({ p, i, reduce, hi, children }: { p: MotionValue<number>; i: number; reduce: boolean; hi: boolean; children: React.ReactNode }) {
-  const dir = i % 2 === 0 ? -1 : 1;
-  const x = useTransform(p, [0, 1], [`${dir * 18}vw`, "0vw"]);
-  const o = useTransform(p, [0, 0.6], [0, 1]);
-  return (
-    <motion.span aria-hidden className={`mr-[0.22em] inline-block will-change-transform ${hi ? "hi-word" : ""}`} style={reduce ? undefined : { x, opacity: o }}>
-      {children}
-    </motion.span>
-  );
-}
 
-/** Starts smaller, rounder and dimmer; grows to full size as it scrolls up. */
-export function ScrollZoom({ children, className = "", from = 0.84 }: { children: React.ReactNode; className?: string; from?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
+/** Starts a little smaller and lower; grows into place as soon as it's on screen. */
+export function ScrollZoom({ children, className = "", from = 0.9 }: { children: React.ReactNode; className?: string; from?: number }) {
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 25%"] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 });
-  const scale = useTransform(p, [0, 1], [from, 1]);
-  const opacity = useTransform(p, [0, 0.5], [0.35, 1]);
-  const y = useTransform(p, [0, 1], [80, 0]);
   return (
-    <motion.div ref={ref} className={`overflow-hidden ${className}`} style={reduce ? undefined : { scale, opacity, y, borderRadius: 18 }}>
+    <motion.div
+      className={`overflow-hidden rounded-[18px] ${className}`}
+      initial={reduce ? false : { scale: from, opacity: 0, y: 40 }}
+      whileInView={{ scale: 1, opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+    >
       {children}
     </motion.div>
   );

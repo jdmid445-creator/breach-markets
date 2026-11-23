@@ -31,7 +31,7 @@ export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast 
   );
 }
 
-/** Fade, rise and un-blur into view. */
+/** Fade and rise into view the moment it reaches the screen. */
 export function Reveal({ children, className = "", delay = 0, y = 28 }: { children: React.ReactNode; className?: string; delay?: number; y?: number }) {
   const reduce = useReducedMotion();
   return (
@@ -39,8 +39,8 @@ export function Reveal({ children, className = "", delay = 0, y = 28 }: { childr
       className={className}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: 0.75, ease: EASE, delay }}
+      viewport={{ once: true, margin: "0px 0px -40px 0px" }}
+      transition={{ duration: 0.6, ease: EASE, delay }}
     >
       {children}
     </motion.div>

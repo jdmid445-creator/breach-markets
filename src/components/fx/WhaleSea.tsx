@@ -476,13 +476,14 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
         <Scene trades={trades} fresh={fresh} onPick={(t) => router.push(`/trader/${t.wallet}`)} hover={hover} setHover={setHover} now={now} />
         <OrbitControls
           makeDefault
-          enabled={!touch}
           enableZoom={false}
           enablePan={false}
           autoRotate={!reduce && hover === null}
           autoRotateSpeed={0.35}
-          minPolarAngle={0.6}
-          maxPolarAngle={1.2}
+          // on phones a sideways swipe spins the sea and an up/down swipe still scrolls the page
+          rotateSpeed={touch ? 0.55 : 1}
+          minPolarAngle={touch ? 0.66 : 0.6}
+          maxPolarAngle={touch ? 0.66 : 1.2}
           target={[0, 0.4, 0]}
           enableDamping
         />
@@ -499,7 +500,7 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
         <span className="flex items-center gap-1.5">
           <i className="h-2 w-2 rounded-full bg-stone" /> Unranked
         </span>
-        <span className="ml-auto max-sm:hidden">{touch ? "Tap a tail" : "Drag to turn · click a tail"}</span>
+        <span className="ml-auto">{touch ? "Swipe sideways to turn · tap a tail" : "Drag to turn · click a tail"}</span>
       </div>
     </div>
   );
