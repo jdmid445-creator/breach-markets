@@ -6,14 +6,14 @@ import { usd } from "@/lib/format";
 const EASE = [0.23, 1, 0.32, 1] as const;
 
 /** Headline that rises in word by word out of a blur, once, when it scrolls into view. */
-export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast = false, spot = false }: { text: string; className?: string; as?: "h1" | "h2" | "h3"; delay?: number; hiLast?: boolean; spot?: boolean }) {
+export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast = false }: { text: string; className?: string; as?: "h1" | "h2" | "h3"; delay?: number; hiLast?: boolean }) {
   const ref = useRef<HTMLHeadingElement>(null);
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
   const reduce = useReducedMotion();
   const Tag = motion[as];
   const words = text.split(" ");
   return (
-    <Tag ref={ref} className={className} aria-label={text} data-whale-spot={spot || undefined}>
+    <Tag ref={ref} className={className} aria-label={text}>
       {words.map((w, i) => (
         <span key={i} aria-hidden className={`inline-block overflow-hidden align-bottom ${hiLast && i === words.length - 1 && words.length > 1 ? "-mb-[0.2em] pb-[0.28em] pr-[0.1em]" : "pb-[0.08em]"}`}>
           <motion.span

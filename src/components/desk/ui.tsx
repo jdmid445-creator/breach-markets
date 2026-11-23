@@ -78,7 +78,7 @@ export function PageHeader({ title, sub, aside, children }: { title: string; sub
     <header className="mx-auto max-w-[1360px] px-5 pb-6 pt-40 sm:pt-32 md:px-8">
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
         <div className="min-w-0">
-          <SplitTitle as="h1" text={title} hiLast spot className="mega text-[clamp(44px,7.5vw,124px)] text-fg" />
+          <SplitTitle as="h1" text={title} hiLast className="mega text-[clamp(44px,7.5vw,124px)] text-fg" />
           {sub && (
             <Reveal delay={0.3} y={14}>
               <p className="mt-4 max-w-[62ch] text-[16px] leading-relaxed text-mist">{sub}</p>

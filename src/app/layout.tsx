@@ -13,7 +13,6 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { DeepBackground } from "@/components/fx/DeepBackground";
 import { CursorFx } from "@/components/fx/CursorFx";
-import { SwimmingWhale } from "@/components/fx/whale/SwimmingWhale";
 import { CommandPalette } from "@/components/desk/CommandPalette";
 
 export const metadata: Metadata = {
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen">
         <DeepBackground />
-        <SwimmingWhale />
         <Nav />
         <main>{children}</main>
         <Footer />
