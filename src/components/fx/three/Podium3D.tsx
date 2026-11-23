@@ -15,7 +15,7 @@ const SLOTS = [
   { place: 3, x: 2.55, h: 1.15, color: "#4a82ad" },
 ];
 
-function Pillar({ row, slot, delay, signed, onPick }: { row: PodiumRow; slot: (typeof SLOTS)[number]; delay: number; signed: boolean; onPick: () => void }) {
+function Pillar({ row, slot, delay, signed, onPick, labels }: { row: PodiumRow; slot: (typeof SLOTS)[number]; delay: number; signed: boolean; onPick: () => void; labels: boolean }) {
   const g = useRef<THREE.Group>(null);
   const coin = useRef<THREE.Group>(null);
   const born = useRef<number | null>(null);
@@ -64,6 +64,7 @@ function Pillar({ row, slot, delay, signed, onPick }: { row: PodiumRow; slot: (t
           <meshStandardMaterial color={first ? "#ffffff" : "#105bff"} metalness={0.3} roughness={0.3} />
         </mesh>
       </group>
+      {labels && (
       <Html position={[0, slot.h + 1.75, 0]} center zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
         <div className="w-[190px] text-center">
           <div className="truncate text-[15px] font-semibold text-fg">{row.name}</div>
@@ -71,12 +72,13 @@ function Pillar({ row, slot, delay, signed, onPick }: { row: PodiumRow; slot: (t
           <div className="text-[12px] text-faint">{row.sub}</div>
         </div>
       </Html>
+      )}
     </group>
   );
 }
 
 /** The top three on a podium you can look around: pillars rise, coins spin, click one to open the trader. */
-export default function Podium3D({ rows, signed = false }: { rows: PodiumRow[]; signed?: boolean }) {
+export default function Podium3D({ rows, signed = false, labels = true }: { rows: PodiumRow[]; signed?: boolean; labels?: boolean }) {
   const router = useRouter();
   const g = useRef<THREE.Group>(null);
   useFrame(({ pointer }, dt) => {
@@ -102,6 +104,7 @@ export default function Podium3D({ rows, signed = false }: { rows: PodiumRow[]; 
               slot={slot}
               delay={[0.15, 0, 0.3][i]}
               signed={signed}
+              labels={labels}
               onPick={() => router.push(`/trader/${rows[slot.place - 1].address}`)}
             />
           ) : null,

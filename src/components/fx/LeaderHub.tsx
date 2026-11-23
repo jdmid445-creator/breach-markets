@@ -148,6 +148,14 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
             rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: single ? `${t.trades ?? 0} ${t.trades === 1 ? "bet" : "bets"} today` : sort === "PNL" ? "profit today" : "traded today" }))}
           />
         )}
+        {top.length >= 3 && (
+          <Podium3D
+            key={`m-${key}`}
+            labels={false}
+            className="-mx-5 h-[260px] md:hidden"
+            rows={top.map((t) => ({ address: t.address, name: t.name, value: metric(t), sub: "" }))}
+          />
+        )}
         {top.length > 0 && (
           <div className={`grid gap-4 md:grid-cols-3 ${top.length >= 3 ? "md:hidden" : ""}`}>
             <AnimatePresence mode="popLayout" initial={false}>

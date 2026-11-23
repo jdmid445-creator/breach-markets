@@ -15,10 +15,10 @@ export function HeroTail3D({ className = "" }: { className?: string }) {
   );
 }
 
-export function Podium3D({ rows, signed, className = "" }: { rows: PodiumRow[]; signed?: boolean; className?: string }) {
+export function Podium3D({ rows, signed, labels = true, className = "" }: { rows: PodiumRow[]; signed?: boolean; labels?: boolean; className?: string }) {
   return (
-    <LazyCanvas className={className} camera={{ position: [0, 2.6, 9], fov: 34 }}>
-      <PodiumScene rows={rows} signed={signed} />
+    <LazyCanvas className={className} camera={{ position: [0, 2.6, labels ? 9 : 11], fov: 34 }}>
+      <PodiumScene rows={rows} signed={signed} labels={labels} />
     </LazyCanvas>
   );
 }

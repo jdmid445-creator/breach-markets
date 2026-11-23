@@ -79,7 +79,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
               )}
             </div>
           </div>
-          <Medal3D rank={best?.rank ?? null} label={best ? `${best.label} profit` : "unranked"} className="hidden h-[190px] w-[190px] shrink-0 md:block" />
+          <Medal3D rank={best?.rank ?? null} label={best ? `${best.label} profit` : "unranked"} className="h-[150px] w-[150px] shrink-0 max-md:-mt-2 md:h-[190px] md:w-[190px]" />
           <a
             href={pmProfile(address)}
             target="_blank"

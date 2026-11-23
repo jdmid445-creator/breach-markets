@@ -4,7 +4,7 @@ import { usd, cents, pmMarket } from "@/lib/format";
 import { ScrollIntro } from "@/components/ScrollIntro";
 import { HomeLive } from "@/components/desk/Whales";
 import { LeaderHub } from "@/components/fx/LeaderHub";
-import { Reveal } from "@/components/fx/motion";
+import { Reveal, SplitTitle } from "@/components/fx/motion";
 import { BigTitle, VelocityTape } from "@/components/fx/scroll";
 import { HeroTail3D } from "@/components/fx/three";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
@@ -41,13 +41,14 @@ export default async function Home() {
   return (
     <>
       <ScrollIntro />
-      {/* seam: the intro's night water hands off to the desk */}
-      <div aria-hidden className="h-24 bg-[linear-gradient(180deg,#0a0f26,#03203d)]" />
+      {/* seam: the intro's night water melts straight into the desk's water, no band */}
+      <div aria-hidden className="pointer-events-none relative z-0 -mb-56 h-56 bg-[linear-gradient(180deg,#0a0f26_0%,rgba(10,15,38,.6)_45%,rgba(10,15,38,0)_100%)]" />
 
-      <div className="mx-auto max-w-[1360px] px-5 pt-28 md:px-8">
+      <div className="relative mx-auto max-w-[1360px] px-5 pt-6 md:px-8 md:pt-10">
         <div className="relative">
-          <BigTitle text="Top traders today" hi={["today"]} className="relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
+          <SplitTitle as="h2" text="Top traders today" hiLast className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
           <HeroTail3D className="pointer-events-none absolute -right-4 top-[10px] hidden h-[380px] w-[380px] lg:block xl:right-4" />
+          <HeroTail3D className="pointer-events-none -my-4 mx-auto h-[240px] w-[240px] lg:hidden" />
         </div>
         <div className="mt-6">
           <LeaderHub initial={today ?? []} titled={false} />
