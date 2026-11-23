@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from "motion/react";
+import { motion, useScroll, useSpring, useTransform, useMotionValueEvent, useReducedMotion } from "motion/react";
 import { INTRO } from "@/lib/media";
 
 /**
  * Cinematic, scroll-driven intro.
- * 0.00–0.62  the dive: scroll scrubs the underwater clip frame by frame
+ * 0.00–0.62  the dive: underwater clip plays while the story lines scroll by
  * 0.55–1.00  the breach: the second clip plays, BREACH lands over the splash
  */
 export function ScrollIntro({ stats }: { stats: { label: string; value: string }[] }) {
@@ -15,36 +15,29 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
   const breach = useRef<HTMLVideoElement>(null);
   const reduce = useReducedMotion();
   const [ready, setReady] = useState(false);
-  const target = useRef(0);
 
-  const { scrollYProgress: p } = useScroll({ target: wrap, offset: ["start start", "end end"] });
+  const { scrollYProgress: raw } = useScroll({ target: wrap, offset: ["start start", "end end"] });
+  // Smooth out stepped mouse-wheel input so text and fades glide
+  const p = useSpring(raw, { stiffness: 140, damping: 32, mass: 0.35, restDelta: 0.0005 });
 
-  // Scrub the dive clip smoothly toward the scroll position
+  // Clips play on their own (smooth on any connection); scroll only drives
+  // the text, the crossfade and the reveal. Remote MP4s can't be scrubbed
+  // frame-by-frame without stutter, so we don't tie currentTime to scroll.
   useMotionValueEvent(p, "change", (v) => {
-    target.current = Math.min(1, v / 0.62);
+    const d = dive.current;
     const b = breach.current;
+    if (d) {
+      if (v < 0.66 && d.paused) d.play().catch(() => {});
+      if (v >= 0.66 && !d.paused) d.pause();
+    }
     if (b) {
-      if (v > 0.55 && b.paused) b.play().catch(() => {});
-      if (v < 0.5 && !b.paused) {
-        b.pause();
+      if (v > 0.5 && b.paused) {
         b.currentTime = 0;
+        b.play().catch(() => {});
       }
+      if (v < 0.45 && !b.paused) b.pause();
     }
   });
-  useEffect(() => {
-    let raf = 0;
-    const tick = () => {
-      const v = dive.current;
-      if (v && v.duration && !reduce) {
-        const want = target.current * (v.duration - 0.05);
-        const diff = want - v.currentTime;
-        if (Math.abs(diff) > 0.01) v.currentTime = v.currentTime + diff * 0.18;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [reduce]);
 
   const diveOpacity = useTransform(p, [0, 0.55, 0.64], [1, 1, 0]);
   const breachOpacity = useTransform(p, [0.52, 0.62], [0, 1]);
@@ -71,8 +64,10 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
           src={INTRO.dive}
           muted
           playsInline
+          autoPlay
+          loop
           preload="auto"
-          onLoadedMetadata={() => setReady(true)}
+          onCanPlay={() => setReady(true)}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: reduce ? 0 : diveOpacity }}
         />
@@ -90,7 +85,7 @@ export function ScrollIntro({ stats }: { stats: { label: string; value: string }
         {/* grade + vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,15,38,.85)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-ink to-transparent" />
-        {!ready && !reduce && <div className="absolute inset-0 animate-pulse bg-[radial-gradient(ellipse_at_50%_20%,#1a2250,#0a0f26)]" />}
+        <div className={`pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,#1a2250,#0a0f26)] transition-opacity duration-1000 ${ready ? "opacity-0" : "opacity-100"}`} />
 
         {/* narrative lines during the dive */}
         {!reduce && (
