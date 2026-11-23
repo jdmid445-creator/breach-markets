@@ -201,21 +201,37 @@ function Rig() {
     const aspect = size.width / size.height;
     const v = THREE.MathUtils.degToRad(cam.fov / 2);
     const h = Math.atan(Math.tan(v) * aspect);
-    fit.current = Math.max(10.6 / Math.tan(h), 5.4 / Math.tan(v), 10);
+    // phones crop the outer ring a little so the whales stay big enough to read
+    fit.current = Math.max((aspect < 1 ? 8.2 : 10.6) / Math.tan(h), 5.4 / Math.tan(v), aspect < 1 ? 8 : 10);
     const el = aspect < 1.35 ? 0.92 : 0.62;
     cam.position.set(0, Math.sin(el) * fit.current * 1.5, Math.cos(el) * fit.current * 1.5);
     cam.lookAt(target);
     (controls as unknown as { update?: () => void } | null)?.update?.();
   }, [camera, size, controls, target]);
+  // scroll progress is measured on scroll, never inside the frame loop (reading layout every frame stutters on phones)
+  const prog = useRef(0);
+  useEffect(() => {
+    const el = gl.domElement;
+    const read = () => {
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      prog.current = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.95)));
+    };
+    read();
+    window.addEventListener("scroll", read, { passive: true });
+    window.addEventListener("resize", read);
+    return () => {
+      window.removeEventListener("scroll", read);
+      window.removeEventListener("resize", read);
+    };
+  }, [gl]);
+  const dir = useMemo(() => new THREE.Vector3(), []);
   useFrame((_, dt) => {
-    const r = gl.domElement.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.95)));
-    const want = fit.current * (1.55 - 0.55 * p);
-    const dir = camera.position.clone().sub(target);
+    const want = fit.current * (1.55 - 0.55 * prog.current);
+    dir.copy(camera.position).sub(target);
     const cur = dir.length();
-    const next = cur + (want - cur) * Math.min(1, dt * 4);
-    camera.position.copy(target).add(dir.setLength(next));
+    if (Math.abs(want - cur) < 0.001) return;
+    camera.position.copy(target).add(dir.setLength(cur + (want - cur) * Math.min(1, dt * 4)));
   });
   return null;
 }
@@ -447,12 +463,12 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
   }, []);
 
   return (
-    <div ref={box} className="relative w-full" style={{ height }}>
+    <div ref={box} className="relative w-full" style={{ height: `min(${height}px, 120vw)` }}>
       {mounted && (
       <Canvas
         frameloop={visible ? "always" : "never"}
         camera={{ position: [0, 6.2, 12.5], fov: 38 }}
-        dpr={[1, 1.75]}
+        dpr={touch ? [1, 1.25] : [1, 1.75]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onPointerMissed={() => setHover(null)}
         style={{ touchAction: "pan-y" }}

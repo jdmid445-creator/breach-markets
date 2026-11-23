@@ -26,7 +26,9 @@ export function LazyCanvas({ className = "", style, children, ...props }: Canvas
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [gl, setGl] = useState(true);
+  const [coarse, setCoarse] = useState(false);
   useEffect(() => {
+    setCoarse(window.matchMedia("(pointer: coarse)").matches);
     try {
       const c = document.createElement("canvas");
       setGl(Boolean(c.getContext("webgl2") || c.getContext("webgl")));
@@ -48,7 +50,7 @@ export function LazyCanvas({ className = "", style, children, ...props }: Canvas
   return (
     <div ref={box} className={className} style={style}>
       {mounted && gl && (
-        <Canvas frameloop={visible ? "always" : "never"} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true, localClippingEnabled: true }} style={{ touchAction: "pan-y" }} {...props}>
+        <Canvas frameloop={visible ? "always" : "never"} dpr={coarse ? [1, 1.3] : [1, 1.75]} gl={{ antialias: true, alpha: true, localClippingEnabled: true }} style={{ touchAction: "pan-y" }} {...props}>
           {children}
         </Canvas>
       )}

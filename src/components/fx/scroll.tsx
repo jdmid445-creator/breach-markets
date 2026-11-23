@@ -37,9 +37,8 @@ function Word({ p, i, reduce, hi, children }: { p: MotionValue<number>; i: numbe
   const dir = i % 2 === 0 ? -1 : 1;
   const x = useTransform(p, [0, 1], [`${dir * 18}vw`, "0vw"]);
   const o = useTransform(p, [0, 0.6], [0, 1]);
-  const blur = useTransform(p, [0, 1], ["blur(14px)", "blur(0px)"]);
   return (
-    <motion.span aria-hidden className={`mr-[0.22em] inline-block ${hi ? "text-stone-hi" : ""}`} style={reduce ? undefined : { x, opacity: o, filter: blur }}>
+    <motion.span aria-hidden className={`mr-[0.22em] inline-block will-change-transform ${hi ? "hi-word" : ""}`} style={reduce ? undefined : { x, opacity: o }}>
       {children}
     </motion.span>
   );
@@ -52,11 +51,10 @@ export function ScrollZoom({ children, className = "", from = 0.84 }: { children
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 25%"] });
   const p = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 });
   const scale = useTransform(p, [0, 1], [from, 1]);
-  const radius = useTransform(p, [0, 1], [48, 16]);
   const opacity = useTransform(p, [0, 0.5], [0.35, 1]);
   const y = useTransform(p, [0, 1], [80, 0]);
   return (
-    <motion.div ref={ref} className={`overflow-hidden ${className}`} style={reduce ? undefined : { scale, borderRadius: radius, opacity, y }}>
+    <motion.div ref={ref} className={`overflow-hidden ${className}`} style={reduce ? undefined : { scale, opacity, y, borderRadius: 18 }}>
       {children}
     </motion.div>
   );

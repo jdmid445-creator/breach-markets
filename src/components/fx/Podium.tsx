@@ -20,8 +20,8 @@ export function Podium({ rows, signed = false, label }: { rows: P[]; signed?: bo
       {rows.slice(0, 3).map((t, i) => (
         <motion.div
           key={t.address}
-          initial={reduce ? false : { opacity: 0, y: 40, rotateX: -25, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
+          initial={reduce ? false : { opacity: 0, y: 40, rotateX: -25 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
           transition={{ duration: 0.8, ease: EASE, delay: 0.2 + i * 0.1 }}
           style={{ transformPerspective: 900 }}
         >

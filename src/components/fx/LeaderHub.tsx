@@ -161,9 +161,9 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
                 <motion.div
                   key={`${key}-${t.address}`}
                   layout
-                  initial={reduce ? false : { opacity: 0, y: 40, rotateX: -25, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -20, filter: "blur(8px)", transition: { duration: 0.2 } }}
+                  initial={reduce ? false : { opacity: 0, y: 40, rotateX: -25 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
                   transition={{ duration: 0.7, ease: EASE, delay: i * 0.08 }}
                   style={{ transformPerspective: 900 }}
                 >
@@ -211,11 +211,11 @@ export function LeaderHub({ initial, titled = true }: { initial: Row[]; titled?:
                 <motion.li
                   key={`${key}-${t.address}`}
                   layout
-                  initial={reduce ? false : { opacity: 0, x: -24, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  initial={reduce ? false : { opacity: 0, x: -24 }}
+                  animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, transition: { duration: 0.15 } }}
                   transition={{ duration: 0.5, ease: EASE, delay: 0.15 + i * 0.03 }}
-                  className="border-b border-hair"
+                  className="band"
                 >
                   <Link href={`/trader/${t.address}`} className="spot group grid grid-cols-[30px_32px_1fr_96px] items-center gap-3 rounded-md px-2 py-2.5">
                     <span className="fig text-[14px] text-faint">{i + 4}</span>

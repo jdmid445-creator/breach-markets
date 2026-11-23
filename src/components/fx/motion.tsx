@@ -17,9 +17,9 @@ export function SplitTitle({ text, className = "", as = "h2", delay = 0, hiLast 
       {words.map((w, i) => (
         <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.08em] align-bottom">
           <motion.span
-            className={`inline-block ${hiLast && i === words.length - 1 && words.length > 1 ? "text-stone-hi" : ""}`}
-            initial={reduce ? false : { y: "105%", rotate: 4, filter: "blur(6px)" }}
-            animate={inView ? { y: "0%", rotate: 0, filter: "blur(0px)" } : undefined}
+            className={`inline-block ${hiLast && i === words.length - 1 && words.length > 1 ? "hi-word" : ""}`}
+            initial={reduce ? false : { y: "105%", rotate: 4 }}
+            animate={inView ? { y: "0%", rotate: 0 } : undefined}
             transition={{ duration: 0.8, ease: EASE, delay: delay + i * 0.07 }}
           >
             {w}
@@ -37,8 +37,8 @@ export function Reveal({ children, className = "", delay = 0, y = 28 }: { childr
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
       transition={{ duration: 0.75, ease: EASE, delay }}
     >
@@ -137,8 +137,8 @@ export function RevealRow({ children, className = "", i = 0 }: { children: React
   return (
     <motion.tr
       className={className}
-      initial={reduce ? false : { opacity: 0, x: -20, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "0px 0px -5% 0px" }}
       transition={{ duration: 0.5, ease: EASE, delay: Math.min(i, 12) * 0.04 }}
     >

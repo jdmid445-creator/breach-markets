@@ -6,7 +6,6 @@ import { HomeLive } from "@/components/desk/Whales";
 import { LeaderHub } from "@/components/fx/LeaderHub";
 import { Reveal, SplitTitle } from "@/components/fx/motion";
 import { BigTitle, VelocityTape } from "@/components/fx/scroll";
-import { HeroTail3D } from "@/components/fx/three";
 import { Panel, Empty, MarketIcon } from "@/components/desk/ui";
 import { Avatar } from "@/components/Avatar";
 import { podConsensus } from "@/lib/smart";
@@ -47,8 +46,6 @@ export default async function Home() {
       <div className="relative mx-auto max-w-[1360px] px-5 pt-6 md:px-8 md:pt-10">
         <div className="relative">
           <SplitTitle as="h2" text="Top traders today" hiLast className="mega relative z-10 text-[clamp(52px,9.5vw,156px)] text-fg" />
-          <HeroTail3D className="pointer-events-none absolute -right-4 top-[10px] hidden h-[380px] w-[380px] lg:block xl:right-4" />
-          <HeroTail3D className="pointer-events-none -my-4 mx-auto h-[240px] w-[240px] lg:hidden" />
         </div>
         <div className="mt-6">
           <LeaderHub initial={today ?? []} titled={false} />
@@ -84,12 +81,12 @@ export default async function Home() {
             {pod.length === 0 ? (
               <Empty>None of the top traders share a position right now.</Empty>
             ) : (
-              <ul>
+              <ul className="grid gap-3 md:grid-cols-2">
                 {pod.slice(0, 6).map((p) => (
-                  <li key={p.key} className="spot grid grid-cols-[34px_1fr_auto] items-center gap-4 border-b border-hair px-4 py-3 last:border-0 sm:grid-cols-[34px_1fr_120px_96px]">
-                    <MarketIcon src={p.icon} label={p.title} size={34} />
+                  <li key={p.key} className="tile tile-hover spot grid grid-cols-[38px_1fr_auto] items-center gap-4 p-4 sm:grid-cols-[38px_1fr_auto_auto]">
+                    <MarketIcon src={p.icon} label={p.title} size={38} />
                     <div className="min-w-0">
-                      <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="block truncate text-[14.5px] text-fg hover:underline">
+                      <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="block truncate text-[15.5px] font-medium text-fg hover:underline">
                         {p.title}
                       </a>
                       <div className="mt-0.5 text-[13px] text-faint">
@@ -113,7 +110,7 @@ export default async function Home() {
                         <span className="fig font-semibold text-fg">{p.whales.length}</span> of 15
                       </span>
                     </div>
-                    <div className="fig text-right text-[15px] font-semibold text-fg">{usd(p.value)}</div>
+                    <div className="numeral text-right text-[28px] text-fg">{usd(p.value)}</div>
                   </li>
                 ))}
               </ul>
@@ -122,13 +119,13 @@ export default async function Home() {
           </Reveal>
 
           <Reveal className="lg:col-span-12" delay={0.1}>
-          <Panel title="Whale money by market and size" meta="the recent whale bets above" className="lg:col-span-12" bodyClass="grid gap-x-16 gap-y-8 px-4 py-5 md:grid-cols-2">
+          <Panel title="Whale money by market and size" meta="the recent whale bets above" className="lg:col-span-12" bodyClass="grid gap-3 md:grid-cols-2">
             {mixTop.length === 0 ? (
               <Empty>No whale bets yet.</Empty>
             ) : (
               <>
-                <div>
-                  <h3 className="text-[13px] text-mist">By market type</h3>
+                <div className="tile p-5">
+                  <h3 className="text-[15px] text-mist">By market <em className="serif text-[18px] text-stone-hi">type</em></h3>
                   <div className="mt-3 flex h-3 w-full gap-[2px] overflow-hidden rounded-full">
                     {mixTop.map(([k, v], i) => (
                       <span key={k} className="bar-in h-full" style={{ width: `${(v / mixTotal) * 100}%`, background: SHADES[i], animationDelay: `${i * 60}ms` }} />
@@ -145,8 +142,8 @@ export default async function Home() {
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h3 className="text-[13px] text-mist">By bet size</h3>
+                <div className="tile p-5">
+                  <h3 className="text-[15px] text-mist">By bet <em className="serif text-[18px] text-stone-hi">size</em></h3>
                   <ul className="mt-3 grid gap-3">
                     {SIZES.map((b, i) => (
                       <li key={b.label} className="grid grid-cols-[112px_1fr_32px] items-center gap-3 text-[14px]">

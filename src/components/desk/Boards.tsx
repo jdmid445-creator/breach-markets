@@ -15,7 +15,7 @@ export function MiniBoard({ rows }: { rows: Trader[] | null }) {
   return (
     <ol>
       {list.map((t, i) => (
-        <li key={t.address} className="border-b border-hair last:border-0">
+        <li key={t.address} className="band">
           <Link href={`/trader/${t.address}`} className="row grid grid-cols-[22px_26px_1fr_88px] items-center gap-3 px-3 py-2.5 sm:px-4">
             <span className={`fig text-[13px] ${i < 3 ? "font-semibold text-fg" : "text-faint"}`}>{i + 1}</span>
             <Avatar src={t.image} seed={t.address} name={t.name} size={26} />
@@ -43,7 +43,7 @@ export function TraderTable({ rows, sort, sortHrefs, skip = 0 }: { rows: Trader[
   return (
     <table className="w-full border-collapse text-left">
       <thead>
-        <tr className="border-b border-hair text-[12.5px] text-faint">
+        <tr className="text-[12.5px] text-faint">
           <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
           <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader</th>
           <th className="whitespace-nowrap w-[26%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden" aria-hidden />
@@ -64,11 +64,11 @@ export function TraderTable({ rows, sort, sortHrefs, skip = 0 }: { rows: Trader[
           return (
             <motion.tr
               key={`${t.address}-${i}`}
-              initial={reduce ? false : { opacity: 0, x: -20, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              initial={reduce ? false : { opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "0px 0px -5% 0px" }}
               transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: Math.min(j, 12) * 0.035 }}
-              className="spot-row border-b border-hair last:border-0"
+              className="spot-row band"
             >
               <td className="px-3 py-3 sm:px-4">
                 <span className={`fig ${podium ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{rank}</span>
@@ -124,7 +124,7 @@ export function FlowTable({ rows, offset = 0 }: { rows: FlowRow[]; offset?: numb
   return (
     <table className="w-full border-collapse text-left">
       <thead>
-        <tr className="border-b border-hair text-[12.5px] text-faint">
+        <tr className="text-[12.5px] text-faint">
           <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal">Rank</th>
           <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader and biggest bet</th>
           <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Money moved</th>
@@ -133,7 +133,7 @@ export function FlowTable({ rows, offset = 0 }: { rows: FlowRow[]; offset?: numb
       </thead>
       <tbody>
         {rows.map((r, i) => (
-          <tr key={r.address} className="spot-row border-b border-hair last:border-0">
+          <tr key={r.address} className="spot-row band">
             <td className={`fig px-3 py-3 sm:px-4 ${i + offset < 3 ? "text-[20px] font-semibold text-fg" : "text-[15px] text-mist"}`}>{i + 1 + offset}</td>
             <td className="w-full max-w-0 px-3 py-3 sm:px-4">
               <Link href={`/trader/${r.address}`} className="group flex min-w-0 items-center gap-3">

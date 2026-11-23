@@ -27,20 +27,48 @@ export function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className={`flex min-w-0 flex-col ${framed ? "rounded-lg border border-hair-2 bg-shoal" : "border-t border-hair-2"} ${className}`}>
-      <header className="flex min-h-11 shrink-0 items-center gap-2.5 border-b border-hair px-4">
-        {live && <span className="live-dot shrink-0" aria-label="Live" />}
-        <h2 className="text-[14.5px] font-semibold text-fg">{title}</h2>
-        {meta && <span className="truncate text-[13px] text-faint max-sm:hidden">{meta}</span>}
+    <section className={`flex min-w-0 flex-col ${className}`}>
+      <header className="flex shrink-0 flex-wrap items-end gap-x-3 gap-y-1 pb-4">
+        {live && <span className="live-dot mb-2 shrink-0" aria-label="Live" />}
+        <h2 className="section-title">
+          <Accent text={title} />
+        </h2>
+        {meta && <span className="mb-[3px] text-[14px] text-faint max-sm:hidden">{meta}</span>}
         {href && (
-          <Link href={href} className="press group ml-auto flex shrink-0 items-center gap-1 text-[13px] text-mist hover:text-fg">
+          <Link href={href} className="press group mb-[3px] ml-auto flex shrink-0 items-center gap-1 text-[14px] text-mist hover:text-fg">
             {hrefLabel ?? "Open"}
-            <ArrowRight size={14} strokeWidth={2} className="transition-transform duration-200 ease-[var(--ease-out)] group-hover:translate-x-0.5" />
+            <ArrowRight size={15} strokeWidth={2} className="transition-transform duration-200 ease-[var(--ease-out)] group-hover:translate-x-0.5" />
           </Link>
         )}
       </header>
-      <div className={`relative min-h-0 flex-1 ${bodyClass}`}>{children}</div>
+      <div className={`relative min-h-0 flex-1 ${framed ? "tile overflow-hidden" : ""} ${bodyClass}`}>{children}</div>
     </section>
+  );
+}
+
+/** Section titles set the last word in Instrument Serif italic: "Profit by *window*". */
+export function Accent({ text }: { text: string }) {
+  const i = text.lastIndexOf(" ");
+  if (i < 0) return <em>{text}</em>;
+  return (
+    <>
+      {text.slice(0, i + 1)}
+      <em>{text.slice(i + 1)}</em>
+    </>
+  );
+}
+
+/** One figure on a tile: small label, a big serif numeral, an optional line under it. */
+export function Stat({ label, value, sub, aside, hot = false, className = "" }: { label: React.ReactNode; value: React.ReactNode; sub?: React.ReactNode; aside?: React.ReactNode; hot?: boolean; className?: string }) {
+  return (
+    <div className={`tile tile-hover flex min-w-0 flex-col p-4 sm:p-5 ${hot ? "tile-hot" : ""} ${className}`}>
+      <div className="flex items-center justify-between gap-2 text-[14px] text-mist">
+        <span className="truncate">{label}</span>
+        {aside}
+      </div>
+      <div className="numeral mt-4 truncate text-[clamp(34px,4vw,46px)] text-fg">{value}</div>
+      {sub && <div className="mt-2 truncate text-[13.5px] text-faint">{sub}</div>}
+    </div>
   );
 }
 

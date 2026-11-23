@@ -24,7 +24,8 @@
   --color-scarlet-deep: #cc2629; /* rank chip fill: white label at 5.4:1 */
 
   --font-display: "Archivo Variable", "Helvetica Neue", sans-serif;
-  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -146,3 +147,41 @@ body:has(#intro) header[data-nav]:not(.nav-ready) { opacity: 0; transform: trans
 /* Table rows can't take a pseudo-element (it becomes a stray cell), so they light with a background */
 tr.spot-row { transition: background-color 160ms var(--ease-out); }
 tr.spot-row:hover { background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgba(141,187,224,.13), transparent 70%), color-mix(in oklab, var(--color-reef) 35%, transparent); }
+
+/* ---------- Sections without rules ----------
+   Sections group by space and surface, not hairlines: a heading with one word
+   set in Instrument Serif italic, then tiles. Tables lose their row rules and
+   read as soft alternating bands. */
+.serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.section-title { font-size: clamp(24px, 2.4vw, 32px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; color: var(--color-fg); }
+.section-title em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--color-stone-hi); letter-spacing: -0.005em; }
+.numeral { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.02em; line-height: 0.95; font-variant-numeric: lining-nums tabular-nums; }
+
+.tile {
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgb(141 187 224 / 0.09);
+  background: linear-gradient(150deg, rgb(12 55 96 / 0.62), rgb(3 32 61 / 0.5));
+  box-shadow: inset 0 1px 0 rgb(238 243 248 / 0.05), 0 10px 30px -18px rgb(0 0 0 / 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: transform 220ms var(--ease-out), border-color 220ms var(--ease-out), background-color 220ms var(--ease-out);
+}
+@media (hover: hover) {
+  .tile-hover:hover { transform: translateY(-2px); border-color: rgb(141 187 224 / 0.22); }
+}
+.tile-hot { border-color: rgb(235 47 51 / 0.35); background: linear-gradient(150deg, rgb(120 20 28 / 0.32), rgb(3 32 61 / 0.55)); }
+
+main table thead tr, main table tbody tr { border-bottom-width: 0; }
+main table thead th { color: var(--color-faint); font-size: 12.5px; font-weight: 500; padding-bottom: 10px; }
+main table tbody tr:nth-child(odd) > td { background-color: rgb(141 187 224 / 0.04); }
+main table tbody tr > td:first-child { border-top-left-radius: 14px; border-bottom-left-radius: 14px; }
+main table tbody tr > td:last-child { border-top-right-radius: 14px; border-bottom-right-radius: 14px; }
+main table tbody tr.row:hover > td { background-color: rgb(141 187 224 / 0.1); }
+main table tbody tr.row:hover { background: transparent; }
+.band { border-radius: 14px; transition: background-color 160ms var(--ease-out); }
+.band:nth-child(odd) { background-color: rgb(141 187 224 / 0.04); }
+@media (hover: hover) { .band:hover { background-color: rgb(141 187 224 / 0.1); } }
+main table tbody tr.spot-row:hover > td { background-color: rgb(141 187 224 / 0.1); }
+/* The accent word in big titles drops out of the caps into Instrument Serif italic. */
+.hi-word { font-family: var(--font-serif); font-style: italic; font-weight: 400; text-transform: none; font-stretch: 100%; letter-spacing: -0.02em; color: var(--color-stone-hi); }

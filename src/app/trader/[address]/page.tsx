@@ -4,7 +4,7 @@ import { positions, profile, standing, userTrades, short, displayName, type Peri
 import { usd, cents, ago, pmMarket, pmProfile } from "@/lib/format";
 import { bucketLabel } from "@/lib/sports";
 import { Avatar } from "@/components/Avatar";
-import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified, Side } from "@/components/desk/ui";
+import { Panel, Empty, MarketIcon, RankChip, Pnl, Verified, Side, Stat, Accent } from "@/components/desk/ui";
 import { Sea } from "@/components/fx/Sea";
 import { Counter, Reveal, SplitTitle } from "@/components/fx/motion";
 import { CopyAddress } from "@/components/desk/CopyAddress";
@@ -98,56 +98,36 @@ export default async function TraderPage({ params }: { params: Promise<{ address
           </Panel>
           <div className="grid content-start gap-10 lg:col-span-4">
             <Panel title="Profit by window">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-hair text-[12.5px] text-faint">
-                    <th className="whitespace-nowrap px-4 py-2 font-normal">Window</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-right font-normal">Profit</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-right font-normal">Rank</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PERIODS.map((p, i) => {
-                    const st = stands[i];
-                    return (
-                      <tr key={p.id} className="border-b border-hair last:border-0">
-                        <td className="px-4 py-2.5 text-[14px] text-mist">
-                          {p.label}
-                          <span className="fig block text-[12.5px] text-faint">{st ? `${usd(st.volume)} volume` : "no volume"}</span>
-                        </td>
-                        <td className="px-4 py-2.5 text-right">
-                          {st ? (
-                            <Pnl value={st.pnl} className="text-[17px]">
-                              <Counter value={st.pnl} sign />
-                            </Pnl>
-                          ) : (
-                            <span className="text-faint">—</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2.5 text-right">{st?.rankPnl ? <RankChip rank={st.rankPnl} /> : <span className="text-[13px] text-faint">Unranked</span>}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="grid grid-cols-2 gap-3">
+                {PERIODS.map((p, i) => {
+                  const st = stands[i];
+                  return (
+                    <Stat
+                      key={p.id}
+                      hot={Boolean(st?.rankPnl && st.rankPnl <= 10)}
+                      label={p.label}
+                      aside={st?.rankPnl ? <RankChip rank={st.rankPnl} /> : undefined}
+                      value={st ? <Pnl value={st.pnl}><Counter value={st.pnl} sign /></Pnl> : <span className="text-faint">—</span>}
+                      sub={st ? `${usd(st.volume)} traded` : "no trades"}
+                      className="!p-4 [&_.numeral]:text-[clamp(26px,2.6vw,34px)]"
+                    />
+                  );
+                })}
+              </div>
             </Panel>
-            <Panel title="Right now" bodyClass="px-4 py-1">
-              <dl className="divide-y divide-hair">
-                <Row label="Open positions" value={<span className="text-fg"><Counter value={openValue} /></span>} sub={`${pos.length} markets`} />
-                <Row
-                  label="Unrealized P&L"
-                  value={
-                    pos.length ? (
-                      <Pnl value={openPnl}><Counter value={openPnl} sign /></Pnl>
-                    ) : (
-                      <span className="text-faint">—</span>
-                    )
-                  }
+            <Panel title="Right now">
+              <div className="grid grid-cols-2 gap-3">
+                <Stat label="Open positions" value={<Counter value={openValue} />} sub={`${pos.length} ${pos.length === 1 ? "market" : "markets"}`} className="!p-4 [&_.numeral]:text-[clamp(26px,2.6vw,34px)]" />
+                <Stat
+                  label="Unrealized"
+                  value={pos.length ? <Pnl value={openPnl}><Counter value={openPnl} sign /></Pnl> : <span className="text-faint">—</span>}
+                  sub="if they sold now"
+                  className="!p-4 [&_.numeral]:text-[clamp(26px,2.6vw,34px)]"
                 />
-                <Row label="Biggest recent bet" value={<span className="fig text-fg">{biggest ? usd(biggest.usd) : "—"}</span>} sub={biggest?.title} />
-              </dl>
+                <Stat label="Biggest recent bet" value={biggest ? usd(biggest.usd) : "—"} sub={biggest?.title} className="col-span-2 !p-4 [&_.numeral]:text-[clamp(26px,2.6vw,34px)]" />
+              </div>
             </Panel>
-            <Panel title="Where they play" meta="share of recent money" bodyClass="p-4">
+            <Panel title="Where they play" meta="share of recent money" bodyClass="tile p-5">
               {mixRows.length === 0 ? (
                 <Empty>No recent trades.</Empty>
               ) : (
@@ -173,14 +153,14 @@ export default async function TraderPage({ params }: { params: Promise<{ address
         </div>
 
         <Reveal className="mt-16">
-          <h2 className="title text-[clamp(26px,3vw,40px)] text-fg">Open positions</h2>
-          <div className="mt-4 overflow-x-auto border-t border-hair-2">
+          <h2 className="section-title"><Accent text="Open positions" /></h2>
+          <div className="mt-4 overflow-x-auto">
             {pos.length === 0 ? (
               <Empty>No open positions right now.</Empty>
             ) : (
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-hair text-[12.5px] text-faint">
+                  <tr className="text-[12.5px] text-faint">
                     <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Market and side</th>
                     <th className="whitespace-nowrap w-[28%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">Entry → now</th>
                     <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Value</th>
@@ -189,7 +169,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                 </thead>
                 <tbody>
                   {pos.map((p) => (
-                    <tr key={`${p.conditionId}-${p.outcome}`} className="row border-b border-hair last:border-0">
+                    <tr key={`${p.conditionId}-${p.outcome}`} className="row band">
                       <td className="w-full max-w-0 px-3 py-3 sm:px-4">
                         <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
                           <MarketIcon src={p.icon} label={p.title} size={34} />
@@ -222,14 +202,14 @@ export default async function TraderPage({ params }: { params: Promise<{ address
         </Reveal>
 
         <Reveal className="mt-16">
-          <h2 className="title text-[clamp(26px,3vw,40px)] text-fg">Recent trades</h2>
-          <div className="mt-4 overflow-x-auto border-t border-hair-2">
+          <h2 className="section-title"><Accent text="Recent trades" /></h2>
+          <div className="mt-4 overflow-x-auto">
             {trades.length === 0 ? (
               <Empty>No recent trades.</Empty>
             ) : (
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-hair text-[12.5px] text-faint">
+                  <tr className="text-[12.5px] text-faint">
                     <th className="whitespace-nowrap w-[52px] px-3 sm:w-[72px] py-2.5 sm:px-4 font-normal max-sm:hidden">When</th>
                     <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Bet</th>
                     <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Size</th>
@@ -237,7 +217,7 @@ export default async function TraderPage({ params }: { params: Promise<{ address
                 </thead>
                 <tbody>
                   {trades.slice(0, 30).map((t) => (
-                    <tr key={t.id} className="row border-b border-hair last:border-0">
+                    <tr key={t.id} className="row band">
                       <td className="fig px-3 py-3 sm:px-4 text-[13px] text-faint max-sm:hidden">{ago(t.ts, now)}</td>
                       <td className="w-full max-w-0 px-3 py-3 sm:px-4">
                         <a href={pmMarket(t.eventSlug, t.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
@@ -261,18 +241,6 @@ export default async function TraderPage({ params }: { params: Promise<{ address
         </Reveal>
       </div>
     </>
-  );
-}
-
-function Row({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 py-3">
-      <dt className="min-w-0 text-[13.5px] text-mist">
-        {label}
-        {sub && <span className="mt-0.5 block truncate text-[12.5px] text-faint">{sub}</span>}
-      </dt>
-      <dd className="shrink-0 text-[18px] font-semibold">{value}</dd>
-    </div>
   );
 }
 

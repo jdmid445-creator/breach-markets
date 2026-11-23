@@ -54,7 +54,7 @@ export function HomeLive({ initial }: { initial: Trade[] }) {
           All alerts <ArrowUpRight size={15} className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </Link>
       </div>
-      <div className="mt-5 grid gap-x-10 border-t border-hair-2 md:grid-cols-2">
+      <div className="mt-5 grid gap-x-10 md:grid-cols-2">
         <WhaleList trades={trades.slice(0, 6)} fresh={fresh} now={now} />
         <div className="max-md:hidden">
           <WhaleList trades={trades.slice(6, 12)} fresh={fresh} now={now} />
@@ -88,7 +88,7 @@ export function WhaleList({ trades, fresh, now }: { trades: Trade[]; fresh?: Set
             initial={isNew ? { opacity: 0, y: -18, scale: 0.97 } : false}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className={`border-b border-hair last:border-0 ${isNew ? "row-wash" : ""}`}
+            className={`band ${isNew ? "row-wash" : ""}`}
           >
             <div className="spot grid grid-cols-[28px_1fr_auto] items-start gap-3 px-3 py-3 sm:px-4">
               <MarketIcon src={t.icon} label={t.title} size={28} />
@@ -154,7 +154,7 @@ export function LiveDesk({ initial }: { initial: Trade[] }) {
   return (
     <div className="mx-auto max-w-[1360px] px-5 md:px-8">
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-hair py-3">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
         <ButtonGroup label="Market" value={market} onChange={setMarket} options={MARKETS.map((m) => ({ value: m.id, label: m.label }))} />
         <ButtonGroup
           label="Side"
@@ -234,12 +234,12 @@ export function LiveDesk({ initial }: { initial: Trade[] }) {
       </p>
 
       <div className="mt-4 grid items-start gap-6 lg:grid-cols-2">
-        <div className="overflow-x-auto border-t border-hair-2">
+        <div className="overflow-x-auto">
           <WhaleTable trades={shown} fresh={fresh} now={now} />
         </div>
         <div className="max-lg:order-first lg:sticky lg:top-[108px]">
-          <div className="overflow-hidden rounded-xl border border-hair-2 bg-shoal/40">
-            <div className="flex items-center gap-2.5 border-b border-hair px-4 py-3">
+          <div className="tile overflow-hidden">
+            <div className="flex items-center gap-2.5 px-4 py-3">
               {status === "live" && !paused && <span className="live-dot" />}
               <span className="text-[14.5px] font-semibold text-fg">The sea</span>
               <span className="text-[13px] text-faint max-sm:hidden">the bets on the left, as tails</span>
@@ -257,7 +257,7 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
   return (
     <table className="w-full border-collapse text-left">
       <thead>
-        <tr className="border-b border-hair text-[12.5px] text-faint">
+        <tr className="text-[12.5px] text-faint">
           <th className="w-[64px] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">When</th>
           <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Trader and bet</th>
           
@@ -275,7 +275,7 @@ export function WhaleTable({ trades, fresh, now }: { trades: Trade[]; fresh?: Se
               initial={fresh?.has(t.id) ? { opacity: 0, y: -16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 380, damping: 32 }}
-              className={`spot-row border-b border-hair last:border-0 ${fresh?.has(t.id) ? "row-wash" : ""}`}
+              className={`spot-row band ${fresh?.has(t.id) ? "row-wash" : ""}`}
             >
               <td className="fig px-3 py-3 sm:px-4 align-top text-[13px] text-faint max-md:hidden" suppressHydrationWarning>
                 {now ? ago(t.ts, now) : ""}

@@ -20,13 +20,13 @@ export default async function SmartMoneyPage() {
         sub="We read the open positions of the 30 most profitable traders this month and list the bets two or more of them share, most shared first. Refreshed every 10 minutes."
       />
       <div className="mx-auto max-w-[1360px] px-5 md:px-8">
-        <div className="overflow-x-auto border-t border-hair-2">
+        <div className="overflow-x-auto">
           {rows.length === 0 ? (
             <Empty>No shared positions right now, or Polymarket didn’t answer. Check back in a few minutes.</Empty>
           ) : (
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-hair text-[12.5px] text-faint">
+                <tr className="text-[12.5px] text-faint">
                   <th className="whitespace-nowrap px-3 py-2.5 font-normal sm:px-4">Market and side</th>
                   <th className="whitespace-nowrap px-3 py-2.5 font-normal max-md:hidden sm:px-4">Top 30 traders holding it</th>
                   <th className="whitespace-nowrap px-3 py-2.5 text-right font-normal max-sm:hidden sm:px-4">Price now</th>
@@ -49,7 +49,7 @@ export default async function SmartMoneyPage() {
 function Row({ a, lead, i }: { a: Consensus; lead: boolean; i: number }) {
   const faces = a.whales.filter(({ t }) => t.image).slice(0, 6);
   return (
-    <RevealRow i={i} className="spot-row border-b border-hair last:border-0">
+    <RevealRow i={i} className="spot-row band">
       <td className={`w-full max-w-0 px-3 sm:px-4 ${lead ? "py-5" : "py-3"}`}>
         <a href={pmMarket(a.eventSlug, a.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
           <MarketIcon src={a.icon} label={a.title} size={lead ? 48 : 34} />

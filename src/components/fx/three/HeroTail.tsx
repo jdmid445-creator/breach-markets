@@ -12,13 +12,13 @@ const CYCLE = 11; // seconds per breach
 const ease = (k: number) => 1 - Math.pow(1 - k, 3);
 
 /** Where the tail is in its breach cycle: height out of the water, pitch, and whether it's wet-dripping. */
-function cycle(t: number) {
+function cycle(t: number, peak = 1.05) {
   const k = t % CYCLE;
-  if (k < 2.6) return { y: -2.6 + 3.65 * ease(k / 2.6), pitch: 0.35 * (1 - ease(k / 2.6)), drip: k > 0.8 };
-  if (k < 7.2) return { y: 1.05 + Math.sin((k - 2.6) * 0.9) * 0.04, pitch: Math.sin((k - 2.6) * 0.7) * 0.05, drip: true };
+  if (k < 2.6) return { y: -2.6 + (2.6 + peak) * ease(k / 2.6), pitch: 0.35 * (1 - ease(k / 2.6)), drip: k > 0.8 };
+  if (k < 7.2) return { y: peak + Math.sin((k - 2.6) * 0.9) * 0.04, pitch: Math.sin((k - 2.6) * 0.7) * 0.05, drip: true };
   if (k < 9.6) {
     const s = (k - 7.2) / 2.4;
-    return { y: 1.05 - 3.85 * s * s, pitch: -0.45 * s, drip: s < 0.5 };
+    return { y: peak - (2.8 + peak) * s * s, pitch: -0.45 * s, drip: s < 0.5 };
   }
   return { y: -2.8, pitch: -0.45, drip: false };
 }
@@ -62,16 +62,16 @@ function Water({ rip }: { rip: React.MutableRefObject<number> }) {
 }
 
 /** Water sheeting off the trailing edge: drops fall under gravity and vanish at the surface. */
-function Drips({ tail, active }: { tail: React.MutableRefObject<THREE.Group | null>; active: React.MutableRefObject<boolean> }) {
-  const N = 90;
+export function Drips({ tail, active, floor = -0.55, count = 90 }: { tail: React.MutableRefObject<THREE.Group | null>; active: React.MutableRefObject<boolean>; floor?: number; count?: number }) {
+  const N = count;
   const edge = useMemo(() => trailingEdgePoints(40), []);
   const pts = useRef<THREE.Points>(null);
-  const state = useMemo(() => Array.from({ length: N }, () => ({ p: new THREE.Vector3(0, -9, 0), v: new THREE.Vector3(), life: 0 })), []);
+  const state = useMemo(() => Array.from({ length: N }, () => ({ p: new THREE.Vector3(0, -9, 0), v: new THREE.Vector3(), life: 0 })), [N]);
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(N * 3), 3));
     return g;
-  }, []);
+  }, [N]);
   const tmp = useMemo(() => new THREE.Vector3(), []);
   useFrame((_, dt) => {
     const arr = geo.attributes.position.array as Float32Array;
@@ -87,7 +87,7 @@ function Drips({ tail, active }: { tail: React.MutableRefObject<THREE.Group | nu
         d.v.y -= 4.2 * dt;
         d.p.addScaledVector(d.v, dt);
         d.life -= dt;
-        if (d.p.y < -0.55) d.life = 0;
+        if (d.p.y < floor) d.life = 0;
       }
       const vis = d.life > 0;
       arr[i * 3] = vis ? d.p.x : 0;
@@ -103,10 +103,32 @@ function Drips({ tail, active }: { tail: React.MutableRefObject<THREE.Group | nu
   );
 }
 
-function Fluke({ rip, dripping, groupRef, freeze, yaw }: { rip: React.MutableRefObject<number>; dripping: React.MutableRefObject<boolean>; groupRef: React.MutableRefObject<THREE.Group | null>; freeze?: number; yaw?: number }) {
-  const fluke = useMemo(() => flukeGeometry(3), []);
+export function Fluke({
+  rip,
+  dripping,
+  groupRef,
+  freeze,
+  yaw,
+  peak = 1.05,
+  phase = 1.2,
+  size = 1.35,
+  clip = WATERLINE,
+  seed = 3,
+}: {
+  rip: React.MutableRefObject<number>;
+  dripping: React.MutableRefObject<boolean>;
+  groupRef: React.MutableRefObject<THREE.Group | null>;
+  freeze?: number;
+  yaw?: number;
+  peak?: number;
+  phase?: number;
+  size?: number;
+  clip?: THREE.Plane[];
+  seed?: number;
+}) {
+  const fluke = useMemo(() => flukeGeometry(seed), [seed]);
   const stock = useMemo(() => pedunclGeometry(), []);
-  const barnacles = useMemo(() => barnacleSpots(3, 46), []);
+  const barnacles = useMemo(() => barnacleSpots(seed, 46), [seed]);
   const g = groupRef;
   const inst = useRef<THREE.InstancedMesh>(null);
   const lastK = useRef(99);
@@ -130,8 +152,8 @@ function Fluke({ rip, dripping, groupRef, freeze, yaw }: { rip: React.MutableRef
 
   useFrame(({ clock, pointer }, dt) => {
     if (!g.current) return;
-    const t = freeze ?? clock.elapsedTime + 1.2;
-    const c = cycle(t);
+    const t = freeze ?? clock.elapsedTime + phase;
+    const c = cycle(t, peak);
     const k = t % CYCLE;
     if (k < lastK.current) rip.current = clock.elapsedTime + 0.9; // breaking the surface
     lastK.current = k;
@@ -152,12 +174,12 @@ function Fluke({ rip, dripping, groupRef, freeze, yaw }: { rip: React.MutableRef
   }, [barnacles]);
 
   return (
-    <group ref={g} scale={1.35}>
+    <group ref={g} scale={size}>
       <mesh geometry={stock}>
-        <meshPhysicalMaterial vertexColors roughness={0.42} roughnessMap={roughMap} clearcoat={0.85} clearcoatRoughness={0.12} sheen={0.4} sheenColor="#8dbbe0" clippingPlanes={WATERLINE} />
+        <meshPhysicalMaterial vertexColors roughness={0.42} roughnessMap={roughMap} clearcoat={0.85} clearcoatRoughness={0.12} sheen={0.4} sheenColor="#8dbbe0" clippingPlanes={clip} />
       </mesh>
       <mesh geometry={fluke}>
-        <meshPhysicalMaterial vertexColors roughness={0.4} roughnessMap={roughMap} clearcoat={0.9} clearcoatRoughness={0.1} side={THREE.DoubleSide} sheen={0.35} sheenColor="#8dbbe0" clippingPlanes={WATERLINE} />
+        <meshPhysicalMaterial vertexColors roughness={0.4} roughnessMap={roughMap} clearcoat={0.9} clearcoatRoughness={0.1} side={THREE.DoubleSide} sheen={0.35} sheenColor="#8dbbe0" clippingPlanes={clip} />
       </mesh>
       <instancedMesh
         ref={(m) => {
@@ -167,7 +189,7 @@ function Fluke({ rip, dripping, groupRef, freeze, yaw }: { rip: React.MutableRef
         args={[undefined, undefined, bm.length]}
       >
         <coneGeometry args={[1, 1.2, 7]} />
-        <meshStandardMaterial color="#c9cfd2" roughness={0.9} clippingPlanes={WATERLINE} />
+        <meshStandardMaterial color="#c9cfd2" roughness={0.9} clippingPlanes={clip} />
       </instancedMesh>
     </group>
   );

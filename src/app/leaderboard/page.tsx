@@ -58,7 +58,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             />
           </div>
         )}
-        <div className="overflow-x-auto border-t border-hair-2">
+        <div className="overflow-x-auto">
           <FlowTable rows={flow.length >= 3 ? flow.slice(3) : flow} offset={flow.length >= 3 ? 3 : 0} />
         </div>
       </>
@@ -77,7 +77,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             />
           </div>
         )}
-        <div className="overflow-x-auto border-t border-hair-2">
+        <div className="overflow-x-auto">
           <TraderTable rows={rows} sort={sort} skip={rows.length >= 3 ? 3 : 0} sortHrefs={{ PNL: href({ sort: "PNL" }), VOLUME: href({ sort: "VOLUME" }) }} />
         </div>
       </>
