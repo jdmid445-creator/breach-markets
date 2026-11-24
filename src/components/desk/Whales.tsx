@@ -33,14 +33,15 @@ export function HomeLive({ initial }: { initial: Trade[] }) {
 
   return (
     <section>
-      <ScrollZoom className="relative border border-hair-2 bg-shoal/30">
+      <ScrollZoom className="relative border border-hair-2 bg-shoal/30 max-sm:flex max-sm:flex-col-reverse">
         <Sea trades={trades} fresh={fresh} height={780} />
-        <div className="pointer-events-none absolute left-5 right-5 top-5 flex flex-wrap items-start justify-between gap-4">
+        {/* phones: the figures sit above the sea, not on top of it */}
+        <div className="pointer-events-none flex flex-wrap items-start justify-between gap-3 max-sm:p-4 max-sm:pb-0 sm:absolute sm:left-5 sm:right-5 sm:top-5 sm:gap-4">
           <p className="flex items-center gap-2 rounded-full border border-hair-2 bg-sea/70 px-3 py-1.5 text-[13px] text-mist backdrop-blur-md">
             {status === "live" && <span className="live-dot" />}
             Last 60 whale bets, newest in the middle
           </p>
-          <dl className="grid grid-cols-3 gap-x-6 rounded-2xl border border-hair-2 bg-sea/70 px-5 py-3 backdrop-blur-md">
+          <dl className="grid grid-cols-3 gap-x-6 rounded-2xl border border-hair-2 bg-sea/70 px-5 py-3 backdrop-blur-md max-sm:w-full">
             <Stat label="Bets, last hour" value={<Counter value={hour.length} format="int" />} />
             <Stat label="Money moved" value={<Counter value={total} />} />
             <Stat label="Ranked traders" value={<Counter value={hour.length ? (ranked / hour.length) * 100 : 0} format="pct" />} />

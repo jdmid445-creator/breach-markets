@@ -456,6 +456,7 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
   }, []);
 
   return (
+    <div className="relative w-full">
     <div ref={box} className="relative w-full" style={{ height: `min(${height}px, 120vw)` }}>
       {mounted && (
       <Canvas
@@ -482,8 +483,10 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
         />
       </Canvas>
       )}
-      <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px] text-faint">
-        <span>Each tail is a whale bet; taller is bigger</span>
+    </div>
+      {/* phones: the key sits under the sea so it never covers a bet */}
+      <div className="pointer-events-none flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px] text-faint max-sm:px-4 max-sm:pb-4 max-sm:pt-1 sm:absolute sm:bottom-3 sm:left-4 sm:right-4">
+        <span className="max-sm:hidden">Each tail is a whale bet; taller is bigger</span>
         <span className="flex items-center gap-1.5">
           <i className="h-2 w-2 rounded-full bg-scarlet" /> Top-10 trader
         </span>
@@ -493,7 +496,7 @@ export default function WhaleSea({ trades, fresh, height = 520 }: { trades: Trad
         <span className="flex items-center gap-1.5">
           <i className="h-2 w-2 rounded-full bg-stone" /> Unranked
         </span>
-        <span className="ml-auto">{touch ? "Swipe sideways to turn · tap a tail" : "Drag to turn · click a tail"}</span>
+        <span className="sm:ml-auto max-sm:w-full">{touch ? "Taller tail, bigger bet · swipe sideways to turn · tap a tail" : "Drag to turn · click a tail"}</span>
       </div>
     </div>
   );
