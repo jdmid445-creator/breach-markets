@@ -56,8 +56,8 @@ export function DeepBackground() {
             end={{ x: 0.6, y: 1 }}
             colorSpace="oklab"
           />
-          <ContourLines levels={9} lineWidth={1} softness={0.7} gamma={0.9} colorMode="custom" lineColor="#639cc5" backgroundColor="transparent" opacity={small ? 0.06 : 0.08}>
-            <SimplexNoise colorA="#ffffff" colorB="#000000" scale={3.8} contrast={-0.6} seed={11} speed={0.04} />
+          <ContourLines levels={7} lineWidth={small ? 1.2 : 1.4} softness={0.3} gamma={0.9} colorMode="custom" lineColor="#8dbbe0" backgroundColor="transparent" opacity={small ? 0.14 : 0.2}>
+            <SimplexNoise colorA="#ffffff" colorB="#000000" scale={2.4} contrast={-0.6} seed={11} speed={0.14} />
           </ContourLines>
           <FilmGrain strength={0.035} />
         </Shader>
