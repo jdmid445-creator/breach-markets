@@ -93,9 +93,60 @@ export default async function TraderPage({ params }: { params: Promise<{ address
 
       <div className="mx-auto max-w-[1360px] px-5 md:px-8">
         <div className="grid gap-x-8 gap-y-10 lg:grid-cols-12">
-          <Panel framed className="self-start lg:col-span-8" title="Their bets, as tails" meta={`last ${Math.min(trades.length, 60)} trades`}>
-            <Sea trades={trades} height={460} />
-          </Panel>
+          {/* left column: the sea, then open positions in the space under it */}
+          <div className="grid min-w-0 content-start gap-12 lg:col-span-8">
+            <Panel framed title="Their bets, as tails" meta={`last ${Math.min(trades.length, 60)} trades`}>
+              <Sea trades={trades} height={460} />
+            </Panel>
+            <Reveal>
+              <h2 className="section-title"><Accent text="Open positions" /></h2>
+              <div className="mt-4 overflow-x-auto">
+                {pos.length === 0 ? (
+                  <Empty>No open positions right now.</Empty>
+                ) : (
+                  <table className="w-full border-collapse text-left">
+                    <thead>
+                      <tr className="text-[12.5px] text-faint">
+                        <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Market and side</th>
+                        <th className="whitespace-nowrap w-[28%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">Entry → now</th>
+                        <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Value</th>
+                        <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">P&amp;L</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pos.map((p) => (
+                        <tr key={`${p.conditionId}-${p.outcome}`} className="row band">
+                          <td className="w-full max-w-0 px-3 py-3 sm:px-4">
+                            <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
+                              <MarketIcon src={p.icon} label={p.title} size={34} />
+                              <span className="min-w-0">
+                                <span className="block truncate text-[14.5px] text-fg group-hover:underline">{p.title}</span>
+                                <span className="block text-[13px] font-semibold text-stone-hi">{p.outcome}</span>
+                              </span>
+                            </a>
+                          </td>
+                          <td className="px-3 py-3 sm:px-4 max-md:hidden">
+                            <div className="flex items-center gap-3">
+                              <PriceTrack from={p.avgPrice} to={p.curPrice} />
+                              <span className="fig shrink-0 text-[13px] text-mist">
+                                {cents(p.avgPrice)} → <span className="text-fg">{cents(p.curPrice)}</span>
+                              </span>
+                            </div>
+                          </td>
+                          <td className="fig px-3 py-3 sm:px-4 text-right text-[15px] font-semibold text-fg">{usd(p.value)}</td>
+                          <td className="px-3 py-3 sm:px-4 text-right max-sm:hidden">
+                            <Pnl value={p.pnl} className="text-[14px]">
+                              {usd(p.pnl, { sign: true })}
+                            </Pnl>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </Reveal>
+          </div>
           <div className="grid content-start gap-10 lg:col-span-4">
             <Panel title="Profit by window">
               <div className="grid grid-cols-2 gap-3">
@@ -151,55 +202,6 @@ export default async function TraderPage({ params }: { params: Promise<{ address
             </Panel>
           </div>
         </div>
-
-        <Reveal className="mt-16">
-          <h2 className="section-title"><Accent text="Open positions" /></h2>
-          <div className="mt-4 overflow-x-auto">
-            {pos.length === 0 ? (
-              <Empty>No open positions right now.</Empty>
-            ) : (
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="text-[12.5px] text-faint">
-                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 font-normal">Market and side</th>
-                    <th className="whitespace-nowrap w-[28%] px-3 py-2.5 sm:px-4 font-normal max-md:hidden">Entry → now</th>
-                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal">Value</th>
-                    <th className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-right font-normal max-sm:hidden">P&amp;L</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pos.map((p) => (
-                    <tr key={`${p.conditionId}-${p.outcome}`} className="row band">
-                      <td className="w-full max-w-0 px-3 py-3 sm:px-4">
-                        <a href={pmMarket(p.eventSlug, p.slug)} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-3">
-                          <MarketIcon src={p.icon} label={p.title} size={34} />
-                          <span className="min-w-0">
-                            <span className="block truncate text-[14.5px] text-fg group-hover:underline">{p.title}</span>
-                            <span className="block text-[13px] font-semibold text-stone-hi">{p.outcome}</span>
-                          </span>
-                        </a>
-                      </td>
-                      <td className="px-3 py-3 sm:px-4 max-md:hidden">
-                        <div className="flex items-center gap-3">
-                          <PriceTrack from={p.avgPrice} to={p.curPrice} />
-                          <span className="fig shrink-0 text-[13px] text-mist">
-                            {cents(p.avgPrice)} → <span className="text-fg">{cents(p.curPrice)}</span>
-                          </span>
-                        </div>
-                      </td>
-                      <td className="fig px-3 py-3 sm:px-4 text-right text-[15px] font-semibold text-fg">{usd(p.value)}</td>
-                      <td className="px-3 py-3 sm:px-4 text-right max-sm:hidden">
-                        <Pnl value={p.pnl} className="text-[14px]">
-                          {usd(p.pnl, { sign: true })}
-                        </Pnl>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </Reveal>
 
         <Reveal className="mt-16">
           <h2 className="section-title"><Accent text="Recent trades" /></h2>
